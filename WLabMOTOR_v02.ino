@@ -258,6 +258,7 @@ void TTL_CloseMidstemAndOpenRight(){
 
 void TTL_OpenMidstemAndLeft(){
   if(digitalRead(sig_openD1andD3)){
+    Serial.print("sig_openD1andD3 detected, opening midstem and left\n");
     for(int z = 0; z <NumPulses; z++){
       if(USEMIDSTEM ==true){
       digitalWrite(OpenD1, HIGH);
@@ -275,6 +276,7 @@ void TTL_OpenMidstemAndLeft(){
 
 void TTL_CloseVertexOpenLeft(){
   if(digitalRead(sig_CloseVertexOpenLeft)){
+    Serial.print("sig_CloseVertexOpenLeft detected, closing vertex and opening left\n");
     for(int z = 0; z <NumPulses; z++){
       if(USEMIDSTEM ==true){
       digitalWrite(CloseD1, LOW);
@@ -299,6 +301,7 @@ void TTL_CloseVertexOpenLeft(){
 
 void TTL_OpenMidstemAndVertex(){
   if(digitalRead(sig_openD1andD3)){
+    Serial.print("sig_openD1andD3 detected, opening midstem and vertex\n");
     for(int z = 0; z <NumPulses; z++){
       if(USEMIDSTEM ==true){
       digitalWrite(OpenD1, HIGH);
@@ -319,6 +322,7 @@ void TTL_OpenMidstemAndVertex(){
 
 void TTL_CloseRightStartbox(){
   if(digitalRead(sig_closeD4)){
+    Serial.print("sig_closeD4 detected, closing right start box\n");
     for(int z = 0; z <NumPulses; z++){
       digitalWrite(CloseD4, LOW);
       delay(PulseDuration);
@@ -332,6 +336,7 @@ void TTL_CloseRightStartbox(){
 
 void TTL_CloseLeftStartbox(){
   if(digitalRead(sig_closeD5)){
+    Serial.print("sig_closeD5 detected, closing left start box\n");
     for(int z = 0; z <NumPulses; z++){
       digitalWrite(CloseD5, LOW);
       delay(PulseDuration);// not sure I need this
@@ -350,6 +355,7 @@ void TTL_CloseLeftStartbox(){
 
 void button_OpenMidstem(){
   if(!digitalRead(button_openD1)){
+    Serial.print("button_openD1 detected, opening midstem\n");
     for(int z = 0; z <NumPulses; z++){
       digitalWrite(OpenD1, HIGH);
       delay(PulseDuration);// not sure I need this
@@ -361,6 +367,7 @@ void button_OpenMidstem(){
 
 void button_CloseMidstem(){
   if(!digitalRead(button_closeD1)){
+    Serial.print("button_closeD1 detected, closing midstem\n");
     for(int z = 0; z <NumPulses; z++){
       digitalWrite(CloseD1, LOW);
       delay(PulseDuration);// not sure I need this
@@ -372,6 +379,7 @@ void button_CloseMidstem(){
 
 void button_OpenRight(){
   if(!digitalRead(button_openD2)){
+    Serial.print("button_openD2 detected, opening right\n");
     for(int z = 0; z <NumPulses; z++){
       digitalWrite(OpenD2, HIGH);
       delay(PulseDuration);// not sure I need this
@@ -383,6 +391,7 @@ void button_OpenRight(){
 
 void button_CloseRight(){
   if(!digitalRead(button_closeD2)){
+    Serial.print("button_closeD2 detected, closing right\n");
     for(int z = 0; z <NumPulses; z++){
       digitalWrite(CloseD2, LOW);
       delay(PulseDuration);// not sure I need this
@@ -394,6 +403,7 @@ void button_CloseRight(){
 
 void button_OpenLeft(){
   if(!digitalRead(button_openD3)){
+    Serial.print("button_openD3 detected, opening left\n");
     for(int z = 0; z <NumPulses; z++){
       digitalWrite(OpenD3, HIGH);
       delay(PulseDuration);// not sure I need this
@@ -405,6 +415,7 @@ void button_OpenLeft(){
 
 void button_CloseLeft(){
   if(!digitalRead(button_closeD3)){
+    Serial.print("button_closeD3 detected, closing left\n");
     for(int z = 0; z <NumPulses; z++){
       digitalWrite(CloseD3, LOW);
       delay(PulseDuration);
@@ -429,6 +440,7 @@ void button_OpenRightStartBox(){
 
 void button_CloseRightStartBox(){
   if(!digitalRead(button_closeD4)){
+    Serial.print("button_closeD4 detected, closing right start box\n");
     for(int z = 0; z <NumPulses; z++){
       digitalWrite(CloseD4, LOW);
       delay(PulseDuration);// not sure I need this
@@ -440,6 +452,7 @@ void button_CloseRightStartBox(){
 
 void button_OpenLeftStartBox(){
   if(!digitalRead(button_openD5)){
+    Serial.print("button_openD5 detected, opening left start box\n");
     for(int z = 0; z <NumPulses; z++){
       digitalWrite(OpenD5, HIGH);
       delay(PulseDuration);// not sure I need this
@@ -451,6 +464,7 @@ void button_OpenLeftStartBox(){
 
 void button_CloseLeftStartBox(){
   if(!digitalRead(button_closeD5)){
+    Serial.print("button_closeD5 detected, closing left start box\n");
     for(int z = 0; z <NumPulses; z++){
       digitalWrite(CloseD5, LOW);
       delay(PulseDuration);// not sure I need this
