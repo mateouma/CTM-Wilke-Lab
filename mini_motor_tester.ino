@@ -204,14 +204,18 @@ void setup() {
   pinMode(CloseD5,OUTPUT);
   */
 
+  // close all doors
   close_all_doors();
 
-  Serial.print("Setup complete -- doors closed (up)\n");
+  // if midstem not used this session, open midstem/D1
+  if(USEMIDSTEM == false) {
+    feather_pulses(OpenD1, HIGH);
+  }
 
+  Serial.print("Setup complete -- doors closed (up)\n");
 }
 
 void loop() {
-
   // check if buttons are pressed
   button_open_D1();
   button_open_D2();
@@ -245,6 +249,8 @@ void feather_pulses(int pin, int value) {
   for (int i = 0; i < NumPulses; i++) {
     digitalWrite(pin, value);
     delay(PulseDuration);
+    digitalWrite(pin, value);
+    delay(20);
   }
 }
 
@@ -259,33 +265,77 @@ void manual_open_D4() {
 
 //---------------------------------------------
 //---------------------------------------------
-// start of button functions
-// - drive each door with a button
+// recognize button presses and execute corresponding functions
 
 void button_open_D1() {
   if(!digitalRead(button_openD1)) {
-    // open_gate_D1();
-    Serial.print("button d1 pressed\n");
+    Serial.print("button open d1 pressed\n");
   }
 }
 
 void button_open_D2() {
   if(!digitalRead(button_openD2)) {
-    // open_gate_D2();
-    Serial.print("button d2 pressed\n");
+    Serial.print("button open d2 pressed\n");
   }
 }
 
 void button_open_D3() {
   if(!digitalRead(button_openD3)) {
-    // open_gate_D3();
-    Serial.print("button d3 pressed\n");
+    Serial.print("button open d3 pressed\n");
   }
 }
 
 void button_open_D4() {
   if(!digitalRead(button_openD4)) {
     manual_open_D4();
-    Serial.print("button d4 pressed\n");
+    Serial.print("button open d4 pressed\n");
+  }
+}
+
+void button_open_D5() {
+  if(!digitalRead(button_openD5)) {
+    Serial.print("button open d5 pressed\n");
+  }
+}
+
+void button_open_vertex() {
+  if(!digitalRead(button_openVertex)) {
+    Serial.print("button open vertex pressed\n");
+  }
+}
+
+void button_close_D1() {
+  if(!digitalRead(button_closeD1)) {
+    Serial.print("button close d1 pressed\n");
+  }
+}
+
+void button_close_D2() {
+  if(!digitalRead(button_closeD2)) {
+    Serial.print("button close d2 pressed\n");
+  }
+}
+
+void button_close_D3() {
+  if(!digitalRead(button_closeD3)) {
+    Serial.print("button close d3 pressed\n");
+  }
+}
+
+void button_close_D4() {
+  if(!digitalRead(button_closeD4)) {
+    Serial.print("button close d4 pressed\n");
+  }
+}
+
+void button_close_D5() {
+  if(!digitalRead(button_closeD5)) {
+    Serial.print("button close d5 pressed\n");
+  }
+}
+
+void button_close_vertex() {
+  if(!digitalRead(button_closeVertex)) {
+    Serial.print("button close vertex pressed\n");
   }
 }
