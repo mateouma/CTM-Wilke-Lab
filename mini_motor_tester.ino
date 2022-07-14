@@ -1,251 +1,145 @@
-//----------------------------------------------
-//      CODE TO CONTROL WILKE MAZE DOORS 
-//----------------------------------------------
-//                   GOAL
-// - open/close different doors in the maze 
-//----------------------------------------------
-
-//----------------------------------------------
-//              DEVELOPMENT LOG
-//----------------------------------------------
-// v01 by Thomas Elston; telston@nurhopsi.org
-//----------------------------------------------
-// v02 by Gary Wilke; coach.wilke@gmail.com
-//----------------------------------------------
-// mini tester by Mateo Umaguing; mateou@g.ucla.edu
-  
-//             DOOR SPEED / AMOUNT
 // to feather the door
-int NumPulses = 1;   // number of pulses
-int PulseDuration = 20; // 10ms
+int NumPulses = 1;
+int PulseDuration = 20;
 
-// *** NOTE: it's possible that the solenoids will click
-// when activated (some do, some don't). If they click, 
-// just set NumPulses = 1 and elongate PulseDuration
-// so that one long pulse opens/closes the doors. 
+// button inputs
+int button7 = 2;
+int button8 = 3;
+int button9 = 4; // top yellow button
+int button10 = 5;
+int button11 = 6; // bottom yellow button
+int button12 = 7;
+int button13 = 8;
+int button14 = 9;
+int button15 = 12;
+int button16 = 13; // right white button
+int button17 = 14;
+int button18 = 15;
 
-
-//           USE MIDSTEM DOOR OR NOT
-// you might not want to open/close the midstem door
-// during the initial directional training. Here is a
-// variable that lets you turn it off and of
-boolean USEMIDSTEM = false; // can be set to false 
-
-
-// FORMAT:
-// PinName               = pinNum // Connection
-//----------------------------------------------
-//                TTL-INPUTS
-//----------------------------------------------
-// start gate AND right vertex
-// int sig_openD1 = xx; // master pin xx
-// int sig_openD1 = xx; // master pin xx
-
-int sig_openD1andD2 = 36; // master pin 32
-int sig_CloseVertexOpenRight = 37; // master pin 33
-
-// start gate AND left vertex
-int sig_openD1andD3 = 34; // master pin 34
-int sig_CloseVertexOpenLeft = 35; // master pin 35
-
-// start gate AND both vertex doors (for free choices)
-int sig_openVertex = 10; // master pin 10
-int sig_closeVertex = 11; // master pin 11
-
-// right startbox
-int sig_openD4 = 30; // master pin 38
-int sig_closeD4 = 31; // master pin 39
-
-// left start box
-int sig_openD5 = 28; // master pin 40
-int sig_closeD5 = 29; // master pin 41
-
-int ttl_inputs[] = {
-  sig_openD1andD2,
-  sig_CloseVertexOpenRight,
-  sig_openD1andD3,
-  sig_CloseVertexOpenLeft,
-  sig_openVertex,
-  sig_closeVertex,
-  sig_openD4,
-  sig_closeD4,
-  sig_openD5,
-  sig_closeD5
+int buttons[] = {
+  button7,
+  button8,
+  button9,
+  button10,
+  button11,
+  button12,
+  button13,
+  button14,
+  button15,
+  button16,
+  button17,
+  button18
 };
 
-//----------------------------------------------
-//                BUTTON-INPUTS
-//----------------------------------------------
-// start gate / midstem
-int button_openD1 = 2;  // button 7
-int button_closeD1 = 3;  // button 8
+// drive doors
+// these are outputs from the motor arduino to the relays
+int pin40 = 40; // open D1
+int pin41 = 41; // open D2
+int pin42 = 42; // open D3
+int pin43 = 43; // open D4
+int pin44 = 44; // open D5
+int pin45 = 45;
+int pin46 = 46;
+int pin47 = 47;
+int pin48 = 48;
+int pin49 = 49;
+int pin50 = 50;
+int pin51 = 51;
+int pin52 = 52;
+int pin53 = 53;
 
-// right vertex
-int button_openD2 = 4;  // button 9
-int button_closeD2 = 5;  // button 10
-
-// left vertex
-int button_openD3 = 6; // button 11
-int button_closeD3 = 7; // button 12
-
-// both vertex doors (for free choices)
-int button_openVertex = 8; // button 13
-int button_closeVertex = 9; // button 14
-
-// right start box
-int button_openD4 = 12; // button 15
-int button_closeD4 = 13; // button 16
-
-// left start box
-int button_openD5 = 22; // button 17
-int button_closeD5 = 23; // button 18
-
-int button_inputs[] = {
-  button_openD1,
-  button_closeD1,
-  button_openD2,
-  button_closeD2,
-  button_openD3,
-  button_closeD3,
-  button_openVertex,
-  button_closeVertex,
-  button_openD4,
-  button_closeD4,
-  button_openD5,
-  button_closeD5
+int door_pins[] = {
+  pin40,
+  pin41,
+  pin42,
+  pin43,
+  pin44,
+  pin45,
+  pin46,
+  pin47,
+  pin48,
+  pin49,
+  pin50,
+  pin51,
+  pin52,
+  pin53
 };
-
-//----------------------------------------------
-//      OUTPUT TO THE RELAYS / SOLENOIDS
-//----------------------------------------------
-// these drive the doors up/down
-int OpenD1 = 40; // Relay 1
-int CloseD1 = 41; // Relay 1
-int OpenD2 = 42; // Relay 2
-int CloseD2 = 43; // Relay 2
-int OpenD3 = 44; // Relay 3
-int CloseD3 = 45; // Relay 3
-int OpenD4 = 46; // Relay 4
-int CloseD4 = 47; // Relay 4
-int OpenD5 = 48; // Relay 5
-int CloseD5 = 49; // Relay 5
-
-int relay_outputs[] = {
-  OpenD1,
-  CloseD1,
-  OpenD2,
-  CloseD2,
-  OpenD3,
-  CloseD3,
-  OpenD4,
-  CloseD4,
-  OpenD5,
-  CloseD5
-};
-
-//----------------------------------------------
 
 void setup() {
-
-  //Initiate Serial communication.
   Serial.begin(9600);
 
-  // initialize TTL input pins
-  for (int i = 0; i < 10; i++) {
-    pinMode(ttl_inputs[i], INPUT);
-  }
-  /*
-  pinMode(sig_openD1andD2, INPUT); 
-  pinMode(sig_CloseVertexOpenRight, INPUT);
-  pinMode(sig_openD1andD3, INPUT);  
-  pinMode(sig_CloseVertexOpenLeft, INPUT);  
-  pinMode(sig_openVertex, INPUT);
-  pinMode(sig_closeVertex, INPUT);  
-
-  pinMode(sig_openD4, INPUT);  
-  pinMode(sig_closeD4, INPUT);  
-  pinMode(sig_openD5, INPUT);  
-  pinMode(sig_closeD5, INPUT);
-  */
-
   // initialize button pins
-  for (int i = 0; i < 12; i++) {
-    pinMode(button_inputs[i], INPUT_PULLUP);
-  }
-  /*
-  pinMode(button_openD1,INPUT_PULLUP);
-  pinMode(button_closeD1,INPUT_PULLUP);  
-  pinMode(button_openD2,INPUT_PULLUP);  
-  pinMode(button_closeD2,INPUT_PULLUP);  
-  pinMode(button_openD3,INPUT_PULLUP);  
-  pinMode(button_closeD3,INPUT_PULLUP);  
-  pinMode(button_openVertex,INPUT_PULLUP);// not sure I need this
-  pinMode(button_closeVertex,INPUT_PULLUP); // not sure I need this
-  pinMode(button_openD4,INPUT_PULLUP);  
-  pinMode(button_closeD4,INPUT_PULLUP);  
-  pinMode(button_openD5,INPUT_PULLUP);  
-  pinMode(button_closeD5,INPUT_PULLUP); 
-  */
+  // INPUT_PULLUP means button presses register as LOW
+  //pinMode(button7, INPUT_PULLUP);
+  //pinMode(button8, INPUT_PULLUP);
+  //pinMode(button9, INPUT_PULLUP);
+  //pinMode(button10, INPUT_PULLUP);
+  //pinMode(button11, INPUT_PULLUP);
+  //pinMode(button12, INPUT_PULLUP);
+  //pinMode(button13, INPUT_PULLUP);
+  //pinMode(button14, INPUT_PULLUP);
+  //pinMode(button15, INPUT_PULLUP);
+  //pinMode(button16, INPUT_PULLUP);
+  //pinMode(button17, INPUT_PULLUP);
+  //pinMode(button18, INPUT_PULLUP);
+  
+  /*for (int i = 0; i < 12; i++) {
+    pinMode(buttons[i], INPUT_PULLUP);
+  }*/
 
-  // initialize relay output pins
-  for (int i = 0; i < 10; i++) {
-    pinMode(relay_outputs[i], OUTPUT);
-  }
-  /*
-  pinMode(OpenD1,OUTPUT);
-  pinMode(CloseD1,OUTPUT);
-  pinMode(OpenD2,OUTPUT);
-  pinMode(CloseD2,OUTPUT);
-  pinMode(OpenD3,OUTPUT);
-  pinMode(CloseD3,OUTPUT);
-  pinMode(OpenD4,OUTPUT);
-  pinMode(CloseD4,OUTPUT);
-  pinMode(OpenD5,OUTPUT);
-  pinMode(CloseD5,OUTPUT);
-  */
+  pinMode(pin40, OUTPUT);
+  pinMode(pin41, OUTPUT);
+  pinMode(pin42, OUTPUT);
+  pinMode(pin44, OUTPUT);
+  pinMode(pin43, OUTPUT);
+  pinMode(pin45, OUTPUT);
+  pinMode(pin46, OUTPUT);
+  pinMode(pin47, OUTPUT);
+  pinMode(pin48, OUTPUT);
+  pinMode(pin49, OUTPUT);
+  pinMode(pin50, OUTPUT);
+  pinMode(pin51, OUTPUT);
+  pinMode(pin52, OUTPUT);
+  pinMode(pin53, OUTPUT);
 
-  // close all doors
-  close_all_doors();
+  // initialize door pins
+  /*for (int i = 0; i < 14; i++) {
+    pinMode(door_pins[i], OUTPUT);
+  }*/
 
-  // if midstem not used this session, open midstem/D1
-  if(USEMIDSTEM == false) {
-    feather_pulses(OpenD1, HIGH);
-  }
-
-  Serial.print("Setup complete -- doors closed (up)\n");
+  Serial.print("Setup complete\n");
+  delay(2000);
+  Serial.print("beginning tests\n");
+  open_all_doors();
+  delay(5000);
+  
 }
 
 void loop() {
-  // check if buttons are pressed
-  button_open_D1();
-  button_open_D2();
-  button_open_D3();
-  button_open_D4();
+  //button7_func();
+  //button8_func();
+  //button9_func();
+  //button10_func();
+  //button11_func();
+  //button12_func();
+  //button13_func();
+  //button14_func();
+  //button15_func();
+  //button16_func();
+  //button17_func();
+  //button18_func();
 }
 
-//---------------------------------------------
-//---------------------------------------------
-// functions for opening/closing doors
+//-------------------------------------------
+// SIGNAL SEND FUNCTION (OPEN/CLOSE DOORS)
+//-------------------------------------------
 
-void close_all_doors() {
-  for (int i = 0; i < NumPulses; i++) {
-    digitalWrite(CloseD1, LOW);
-    digitalWrite(CloseD2, LOW);
-    digitalWrite(CloseD3, LOW);
-    digitalWrite(CloseD4, LOW);
-    digitalWrite(CloseD5, LOW);
-    delay(PulseDuration); // is this needed?
-    digitalWrite(CloseD1, LOW);
-    digitalWrite(CloseD2, LOW);
-    digitalWrite(CloseD3, LOW);
-    digitalWrite(CloseD4, LOW);
-    digitalWrite(CloseD5, LOW);
-    delay(20);
-  }
-}
-
-// general function for feathering pulses for opening/closing doors
 void feather_pulses(int pin, int value) {
+  Serial.print("Pin ");
+  Serial.print(pin);
+  Serial.print(", Value ");
+  Serial.print(value);
+  Serial.print("\n");
   for (int i = 0; i < NumPulses; i++) {
     digitalWrite(pin, value);
     delay(PulseDuration);
@@ -254,88 +148,118 @@ void feather_pulses(int pin, int value) {
   }
 }
 
-void manual_open_D4() {
-  for (int i = 0; i < NumPulses; i++) {
-    digitalWrite(OpenD4, HIGH);
-    delay(PulseDuration);
-    digitalWrite(OpenD4, HIGH);
-    delay(20);
+void open_all_doors(){
+  feather_pulses(pin40, HIGH);
+  feather_pulses(pin41, HIGH);
+  feather_pulses(pin42, HIGH);
+  feather_pulses(pin43, HIGH);
+  feather_pulses(pin44, HIGH);
+}
+
+//-------------------------------------------
+// BUTTON FUNCTIONS
+//-------------------------------------------
+/*void button7_func() {
+  if(!digitalRead(button7)) {
+    feather_pulses(pin41, HIGH);
+    Serial.print("button 7 pressed\n");
+    delay(500);
+    digitalWrite(button7, HIGH);
+  }
+}*/
+
+/*void button8_func() {
+  if(!digitalRead(button8)) {
+    feather_pulses(pin41, HIGH);
+    Serial.print("button 8 pressed\n");
+    delay(500);
+    digitalWrite(button8, HIGH);
+  }
+}*/
+
+void button9_func() {
+  if(!digitalRead(button9)) {
+    feather_pulses(pin42, HIGH);
+    Serial.print("button 9 pressed\n");
+    delay(500);
   }
 }
 
-//---------------------------------------------
-//---------------------------------------------
-// recognize button presses and execute corresponding functions
+/*void button10_func() {
+  if(!digitalRead(button10)) {
+    feather_pulses(pin41, HIGH);
+    Serial.print("button 10 pressed\n");
+    delay(500);
+    digitalWrite(button10, HIGH);
+  }
+}*/
 
-void button_open_D1() {
-  if(!digitalRead(button_openD1)) {
-    Serial.print("button open d1 pressed\n");
+void button11_func() {
+  if(!digitalRead(button11)) {
+    feather_pulses(pin44, HIGH);
+    Serial.print("button 11 pressed\n");
+    delay(500);
   }
 }
 
-void button_open_D2() {
-  if(!digitalRead(button_openD2)) {
-    Serial.print("button open d2 pressed\n");
+/*void button12_func() {
+  if(!digitalRead(button12)) {
+    feather_pulses(pin41, HIGH);
+    Serial.print("button 12 pressed\n");
+    delay(500);
+    digitalWrite(button12, HIGH);
+  }
+}*/
+
+/*void button13_func() {
+  if(!digitalRead(button13)) {
+    feather_pulses(pin41, HIGH);
+    Serial.print("button 13 pressed\n");
+    delay(500);
+    digitalWrite(button13, HIGH);
+  }
+}*/
+
+/*void button14_func() {
+  if(!digitalRead(button14)) {
+    feather_pulses(pin41, HIGH);
+    Serial.print("button 14 pressed\n");
+    delay(500);
+    digitalWrite(button14, HIGH);
+  }
+}*/
+
+/*void button15_func() {
+  if(!digitalRead(button15)) {
+    feather_pulses(pin41, HIGH);
+    Serial.print("button 15 pressed\n");
+    delay(500);
+    digitalWrite(button15, HIGH);
+  }
+}*/
+
+void button16_func() {
+  if(!digitalRead(button16)) {
+    feather_pulses(pin41, HIGH);
+    Serial.print("button 16 pressed\n");
+    delay(500);
   }
 }
 
-void button_open_D3() {
-  if(!digitalRead(button_openD3)) {
-    Serial.print("button open d3 pressed\n");
+/*void button17_func() {
+  if(!digitalRead(button17)) {
+    feather_pulses(pin41, HIGH);
+    Serial.print("button 17 pressed\n");
+    delay(500);
+    digitalWrite(button17, HIGH);
   }
-}
+}*/
 
-void button_open_D4() {
-  if(!digitalRead(button_openD4)) {
-    manual_open_D4();
-    Serial.print("button open d4 pressed\n");
+/*void button18_func() {
+  if(!digitalRead(button18)) {
+    feather_pulses(pin41, HIGH);
+    Serial.print("button 18 pressed\n");
+    delay(500);
+    digitalWrite(button18, HIGH);
   }
-}
-
-void button_open_D5() {
-  if(!digitalRead(button_openD5)) {
-    Serial.print("button open d5 pressed\n");
-  }
-}
-
-void button_open_vertex() {
-  if(!digitalRead(button_openVertex)) {
-    Serial.print("button open vertex pressed\n");
-  }
-}
-
-void button_close_D1() {
-  if(!digitalRead(button_closeD1)) {
-    Serial.print("button close d1 pressed\n");
-  }
-}
-
-void button_close_D2() {
-  if(!digitalRead(button_closeD2)) {
-    Serial.print("button close d2 pressed\n");
-  }
-}
-
-void button_close_D3() {
-  if(!digitalRead(button_closeD3)) {
-    Serial.print("button close d3 pressed\n");
-  }
-}
-
-void button_close_D4() {
-  if(!digitalRead(button_closeD4)) {
-    Serial.print("button close d4 pressed\n");
-  }
-}
-
-void button_close_D5() {
-  if(!digitalRead(button_closeD5)) {
-    Serial.print("button close d5 pressed\n");
-  }
-}
-
-void button_close_vertex() {
-  if(!digitalRead(button_closeVertex)) {
-    Serial.print("button close vertex pressed\n");
-  }
-}
+}*/
