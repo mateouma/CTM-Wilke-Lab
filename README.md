@@ -9,3 +9,5 @@ Code for Continuous T-Maze (CTM)
 7.13 - Removed button functionality, successfully labeled and implemented door *open* functions in `setup()` in `mini_motor_tester.ino` (MU)
 
 7.13 - Added `PIR_Sensor_Checker.ino` to repository (MU), added sensor pin initialization and attempted sensor functionality (TG)
+
+11.10 - Removed outdated scripts, added most recent and stable scripts (`master_board.ino` and `door_script.ino`) for the master and motor boards. Motor board can open doors and master board can open doors via the motor board, identify PIR sensor movements, and raise/lower effort barriers at will (MU)
