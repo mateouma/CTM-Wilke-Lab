@@ -73,17 +73,21 @@ void setup() {
   digitalWrite(PIR_RightStartBox, HIGH);
   digitalWrite(PIR_LeftStartBox, HIGH);
 
-  playWithBarrier();
+  //playWithBarrier();
   
-  delay(5000);
+  delay(3000);
 
-  // open doors (down)
+  //playWithDoors();
+
+  delay(3000);
+
+  // open all doors
   digitalWrite(outputD1, HIGH);
   digitalWrite(outputD2, HIGH);
   digitalWrite(outputD3, HIGH);
   digitalWrite(outputD4, HIGH);
   digitalWrite(outputD5, HIGH);
-
+  
   Serial.print("Setup complete\n");
 }
 
@@ -118,6 +122,7 @@ void CheckPIRMidstem() {
     Serial.print(digitalRead(PIR_Midstem));
     Serial.print("\n");
     delay(1500);
+    digitalWrite(outputD1,LOW);
   }
 }
 
@@ -136,6 +141,7 @@ void CheckPIRLeftPostVertex() {
     Serial.print(digitalRead(PIR_LeftPostVertex));
     Serial.print("\n");
     delay(1500);
+    digitalWrite(outputD2,LOW);
   }
 }
 
@@ -145,6 +151,7 @@ void CheckPIRRightPostVertex() {
     Serial.print(digitalRead(PIR_RightPostVertex));
     Serial.print("\n");
     delay(1500);
+    digitalWrite(outputD3, LOW);
   }
 }
 
@@ -153,6 +160,7 @@ void CheckPIRLeftPostBarrier() {
     Serial.print("PIR_LPB state: ");
     Serial.print(digitalRead(PIR_LeftPostBarrier));
     Serial.print("\n");
+    digitalWrite(outputD5, LOW);
     delay(1500);
   }
 }
@@ -172,6 +180,7 @@ void CheckPIRLeftStartBox() {
     Serial.print(digitalRead(PIR_LeftStartBox));
     Serial.print("\n");
     delay(1500);
+    digitalWrite(outputD4,LOW);
   }
 }
 
@@ -181,6 +190,7 @@ void CheckPIRRightStartBox() {
     Serial.print(digitalRead(PIR_RightStartBox));
     Serial.print("\n");
     delay(1500);
+    digitalWrite(outputD5,LOW);
   }
 }
 
@@ -192,24 +202,25 @@ void playWithDoors() {
   // opens and closes all doors sequentially
   Serial.print("playing with doors \n");
 
+  // opens D1, waits 3 seconds, closes D1
   digitalWrite(outputD1, HIGH);
-  delay(5000);
+  delay(3000);
   digitalWrite(outputD1, LOW);
 
   digitalWrite(outputD5, HIGH);
-  delay(5000);
+  delay(3000);
   digitalWrite(outputD5, LOW);
 
   digitalWrite(outputD2, HIGH);
-  delay(5000);
+  delay(3000);
   digitalWrite(outputD2, LOW);
 
   digitalWrite(outputD3, HIGH);
-  delay(5000);
+  delay(3000);
   digitalWrite(outputD3, LOW);
 
   digitalWrite(outputD4, HIGH);
-  delay(5000);
+  delay(3000);
   digitalWrite(outputD4, LOW);
 }
 
