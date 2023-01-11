@@ -1,5 +1,5 @@
 // ============================
-// DOOR PINS
+// MOTOR TO RELAY PINS
 // ============================
 
 int D1Pin = 40; //LEDState changed to D1Pin
@@ -51,12 +51,12 @@ void setup() {
   delay(5000);
   
   // close doors
-  digitalWrite(D1Pin, LOW);
-  digitalWrite(D2Pin, LOW);
-  digitalWrite(D3Pin, LOW);
-  digitalWrite(D4Pin, LOW);
-  digitalWrite(D5Pin, LOW);
-
+//  digitalWrite(D1Pin, LOW);
+//  digitalWrite(D2Pin, LOW);
+//  digitalWrite(D3Pin, LOW);
+//  digitalWrite(D4Pin, LOW);
+//  digitalWrite(D5Pin, LOW);
+  
   delay(5000);
 }
 
