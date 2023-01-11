@@ -32,6 +32,19 @@ int PIR_LeftStartBox = 29;
 int PIR_RightStartBox = 30;
 
 // ============================
+// TRIAL EVENTS
+// ============================
+
+bool Midstem_TA = true;
+bool Endstem_TA = true;
+bool LPV_TA = true;
+bool RPV_TA = true;
+bool LPB_TA = true;
+bool RPB_TA = true;
+bool LSB_TA = true;
+bool RSB_TA = true;
+
+// ============================
 // MAIN
 // ============================
 
@@ -73,12 +86,6 @@ void setup() {
   digitalWrite(PIR_RightStartBox, HIGH);
   digitalWrite(PIR_LeftStartBox, HIGH);
 
-  //playWithBarrier();
-  
-  delay(3000);
-
-  //playWithDoors();
-
   delay(3000);
 
   // open all doors
@@ -89,6 +96,7 @@ void setup() {
   digitalWrite(outputD5, HIGH);
   
   Serial.print("Setup complete\n");
+  delay(3000);
 }
 
 void loop() {
@@ -113,84 +121,108 @@ void CheckPIRStart() {
     Serial.print(digitalRead(PIR_Start)); 
     Serial.print("\n");
     delay(1500);
+
+    digitalWrite(outputD1, HIGH);
+    digitalWrite(outputD2, HIGH);
+    digitalWrite(outputD3, HIGH);
+    digitalWrite(outputD4, HIGH);
+    digitalWrite(outputD5, HIGH);
+
+    Midstem_TA = true;
+    Endstem_TA = true;
+    LPV_TA = true;
+    RPV_TA = true;
+    LPB_TA = true;
+    RPB_TA = true;
+    LSB_TA = true;
+    RSB_TA = true;
+
+    delay(3000);
   }
 }
 
 void CheckPIRMidstem() {
-  if(digitalRead(PIR_Midstem)) {
+  if(digitalRead(PIR_Midstem) && Midstem_TA) {
     Serial.print("PIR_Midstem state: ");
     Serial.print(digitalRead(PIR_Midstem));
     Serial.print("\n");
     delay(1500);
-    digitalWrite(outputD1,LOW);
+    digitalWrite(outputD1, LOW);
+    Midstem_TA = false;
   }
 }
 
 void CheckPIREndstem() {
-  if(digitalRead(PIR_Endstem)) {
+  if(digitalRead(PIR_Endstem) && Endstem_TA) {
     Serial.print("PIR_Endstem state: ");
     Serial.print(digitalRead(PIR_Endstem));
     Serial.print("\n");
+    Endstem_TA = false;
     delay(1500);
   }
 }
 
 void CheckPIRLeftPostVertex() {
-  if(digitalRead(PIR_LeftPostVertex)) {
+  if(digitalRead(PIR_LeftPostVertex) && LPV_TA) {
     Serial.print("PIR_LPV state: ");
     Serial.print(digitalRead(PIR_LeftPostVertex));
     Serial.print("\n");
+    LPV_TA = false;
     delay(1500);
-    digitalWrite(outputD2,LOW);
+    digitalWrite(outputD2, LOW);
   }
 }
 
 void CheckPIRRightPostVertex() {
-  if(digitalRead(PIR_RightPostVertex)) {
+  if(digitalRead(PIR_RightPostVertex) && RPV_TA) {
     Serial.print("PIR_RPV state: ");
     Serial.print(digitalRead(PIR_RightPostVertex));
     Serial.print("\n");
+    RPV_TA = false;
     delay(1500);
     digitalWrite(outputD3, LOW);
   }
 }
 
 void CheckPIRLeftPostBarrier() {
-  if(digitalRead(PIR_LeftPostBarrier)) {
+  if(digitalRead(PIR_LeftPostBarrier) && LPB_TA) {
     Serial.print("PIR_LPB state: ");
     Serial.print(digitalRead(PIR_LeftPostBarrier));
     Serial.print("\n");
-    digitalWrite(outputD5, LOW);
+    LPB_TA = false;
     delay(1500);
   }
 }
 
 void CheckPIRRightPostBarrier() {
-  if(digitalRead(PIR_RightPostBarrier)) {
+  if(digitalRead(PIR_RightPostBarrier) && RPB_TA) {
     Serial.print("PIR_RPB state: ");
     Serial.print(digitalRead(PIR_RightPostBarrier));
     Serial.print("\n");
+    RPB_TA = false;
     delay(1500);
   }
 }
 
 void CheckPIRLeftStartBox() {
-  if(digitalRead(PIR_LeftStartBox)) {
+  if(digitalRead(PIR_LeftStartBox) && LSB_TA) {
     Serial.print("PIR_LSB state: ");
     Serial.print(digitalRead(PIR_LeftStartBox));
     Serial.print("\n");
+    LSB_TA = false;
     delay(1500);
-    digitalWrite(outputD4,LOW);
+    digitalWrite(outputD4, LOW);
   }
 }
 
 void CheckPIRRightStartBox() {
-  if(digitalRead(PIR_RightStartBox)) {
+  if(digitalRead(PIR_RightStartBox) && RSB_TA) {
     Serial.print("PIR_RSB state: ");
     Serial.print(digitalRead(PIR_RightStartBox));
     Serial.print("\n");
+    RSB_TA = false;
     delay(1500);
-    digitalWrite(outputD5,LOW);
+    digitalWrite(outputD5, LOW);
   }
 }
 
