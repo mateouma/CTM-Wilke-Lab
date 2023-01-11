@@ -14,4 +14,4 @@ Code for Continuous T-Maze (CTM)
 
 11.11 - Added reward script (MU)
 
-1.11 - Updated scripts for master and motor boards (MU)
+1.11 - Updated scripts for master and motor boards (MU) - active trial state is defined as when the start sensor is triggered. Sensors can only run code (i. e. open doors) once during an active trial until another trial is started.
