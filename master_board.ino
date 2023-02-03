@@ -122,6 +122,7 @@ void CheckPIRStart() {
     Serial.print("\n");
     delay(1500);
 
+    // open doors
     digitalWrite(outputD1, HIGH);
     digitalWrite(outputD2, HIGH);
     digitalWrite(outputD3, HIGH);
@@ -148,7 +149,7 @@ void CheckPIRMidstem() {
     Serial.print("\n");
     delay(1500);
     digitalWrite(outputD1, LOW);
-    Midstem_TA = false;
+    Midstem_TA = false; // PIR sensor cannot do anything until *loc*_TA is true again
   }
 }
 
@@ -157,7 +158,7 @@ void CheckPIREndstem() {
     Serial.print("PIR_Endstem state: ");
     Serial.print(digitalRead(PIR_Endstem));
     Serial.print("\n");
-    Endstem_TA = false;
+    Endstem_TA = false; 
     delay(1500);
   }
 }
@@ -186,8 +187,7 @@ void CheckPIRRightPostVertex() {
 
 void CheckPIRLeftPostBarrier() {
   if(digitalRead(PIR_LeftPostBarrier) && LPB_TA) {
-    Serial.print("PIR_LPB state: ");
-    Serial.print(digitalRead(PIR_LeftPostBarrier));
+    Serial.print("PIR_LPB detection");
     Serial.print("\n");
     LPB_TA = false;
     delay(1500);
@@ -261,7 +261,7 @@ void playWithBarrier() {
   setting barrier to LOW makes it go up
   setting barrier to HIGH makes it go down
    */
-  digitalWrite(barrierR, LOW); 
+  digitalWrite(barrierR, LOW); // LOW = go up
   for (int i = 0; i < 255; i++) {
     analogWrite(barrierRpwm, i);
     delay(5);
@@ -269,7 +269,7 @@ void playWithBarrier() {
   delay(3500);
   analogWrite(barrierRpwm, 0);
 
-  digitalWrite(barrierL, LOW);
+  digitalWrite(barrierL, LOW); // LOW = go up
   for (int i = 0; i < 255; i++) {
     analogWrite(barrierLpwm, i);
     delay(5);
