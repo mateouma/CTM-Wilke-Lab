@@ -11,11 +11,20 @@
 class CTM_base {
   public:
     CTM_base();
-    void configureParams(int HRTime, int LRTime, int barrierRHeight, int barrierLHeight, float prob, char HRside);
+    void configureParams(int HRTime, int LRTime,
+                         int barrierRHeight, int barrierLHeight,
+                         float prob, int HRside,
+                         int ITI, int delayTime,
+                         int nForcetrials, int ftSide);
     void begin();
+
+    // general functions
+    void printConfigParams();
     void resetBarriers();
     void configureBarriers();
     void startTimer();
+
+    // sensor functions
     void ActivatePIRStart();
     void ActivatePIRMidstem();
     void ActivatePIREndstem();
@@ -27,14 +36,24 @@ class CTM_base {
     void ActivatePIRRightStartBox();
     void checkSensors();
     void resetFlags();
-    void activatePump(char rew, char pump, long prob);
+
+    // pump function
+    void activatePump(int rew, int pump, float prob);
+
+    // sensor - door activation
     void PIRStartOpenD1D2D3();
     void PIRMidstemCloseD1();
     void PIRLPBCloseD2D3D5OpenD4();
     void PIRRPBCloseD3D2D4OpenD5();
     void PIRLSBCloseD4();
     void PIRRSBCloseD5();
+
+    // force trial function
+    void enactForceTrials();
+
+    // testing
     void playWithBarriers();
+    void testPump();
 
   private:
     // flags
@@ -60,6 +79,13 @@ class CTM_base {
     // timestamp variables
     unsigned long startTime;
     unsigned long currentTime;
+
+    // Trial Counter
+    int currTrial = 1;
+    int currFt = 1;
+
+    // checking if force trials are active
+    bool ftActive = false;
   
     // =============================
     // PINS
@@ -109,14 +135,28 @@ class CTM_base {
     // barrier heights
     int _bRH;
     int _bLH;
+    int _converted_bRH;
+    int _converted_bLH;
     
     // choosing which side is the HR
-    char _HRside;
-    char _leftReward;
-    char _rightReward;
+    int _HRside;
+    int _leftReward;
+    int _rightReward;
     
     // choosing higher probability
     float _prob;
+
+    // inter-trial interval
+    int _ITI;
+
+    // Time delay between when a sensor is tripped and when the door closes.
+    int _delayTime;
+
+    // number of force trials
+    int _nForceTrials;
+
+    // force trial side
+    int _ftSide;
 };
 
 #endif

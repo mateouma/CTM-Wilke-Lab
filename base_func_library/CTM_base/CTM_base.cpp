@@ -11,20 +11,32 @@ CTM_base::CTM_base() {
 
 }
 
-void CTM_base::configureParams(int HRTime, int LRTime, int barrierRHeight, int barrierLHeight, float prob, char HRside) {
+void CTM_base::configureParams(int HRTime, int LRTime, 
+                               int barrierRHeight, int barrierLHeight, 
+                               float prob, int HRside, 
+                               int ITI, int delayTime,
+                               int nForceTrials, int ftSide) {
+  // HIGH REWARD = 1
+  // LOW REWARD = 0
+
   _HRTime = HRTime;
   _LRTime = LRTime;
   _bRH = barrierRHeight;
   _bLH = barrierLHeight;
   _HRside = HRside;
   _prob = prob;
-  
-  if (HRside == 'R') {
-    _rightReward = "H";
-    _leftReward = "L";
-  } else if (HRside == 'L') {
-    _rightReward = 'L';
-    _leftReward = 'R';
+  _ITI = ITI;
+  _delayTime = delayTime;
+  _nForceTrials = nForceTrials;
+  _ftSide = ftSide;
+
+  // HRside: R is 1, L is 0  
+  if (HRside == 1) {
+    _rightReward = 1; // higher reward
+    _leftReward = 0; // lower reward
+  } else if (HRside == 0) {
+    _rightReward = 0; // lower reward
+    _leftReward = 1; // higher reward
   }
 }
 
@@ -45,6 +57,9 @@ void CTM_base::begin() {
   
   pinMode(barrierL, OUTPUT);
   pinMode(barrierLpwm, OUTPUT);
+
+  pinMode(pump1Output, OUTPUT);
+  pinMode(pump2Output, OUTPUT);
 
   pinMode(PIR_Start, INPUT);
   pinMode(PIR_Midstem, INPUT);
@@ -70,10 +85,43 @@ void CTM_base::begin() {
 
   digitalWrite(outputD2, HIGH); // Open D2
   digitalWrite(outputD3, HIGH); // Open D3
-  
+
   delay(500);
+
+  if (_nForceTrials > 0)
+    ftActive = true;
+
   Serial.print("Setup complete\n");
   startTimer();
+}
+
+void CTM_base::printConfigParams() {
+  if (_HRside == 1) 
+    Serial.println("High Reward Side: Right");
+  else if(_HRside == 0)
+    Serial.println("High Reward Side: Left");
+  else 
+    Serial.println("oops");
+
+  Serial.print("Left Barrier Height: ");
+  Serial.print(_bLH);
+  Serial.print("\n");
+
+  Serial.print("Right Barrier Height: ");
+  Serial.print(_bRH);
+  Serial.print(" cm\n");
+
+  Serial.print("High Reward Time: ");
+  Serial.print(_HRTime);
+  Serial.print(" ms \n");
+
+  Serial.print("Low Reward Time: ");
+  Serial.print(_LRTime);
+  Serial.print(" ms \n");
+
+  Serial.print("Reward Probability");
+  Serial.print(_prob);
+  Serial.print("\n");
 }
 
 void CTM_base::resetBarriers() {
@@ -95,56 +143,62 @@ void CTM_base::resetBarriers() {
 }
 
 void CTM_base::configureBarriers() {
-  // right barrier
-  switch (_bRH) {
-    case 0:
-      // do nothing
-      break;
-    case 5:
-      digitalWrite(barrierR, LOW);
-      for (int i = 0; i < 200; i++) {
-        analogWrite(barrierRpwm, i);
-        delay(8);
-      }
-      delay(300);
-      analogWrite(barrierRpwm, 0);
-      break;
-    case 10:
-      digitalWrite(barrierR, LOW); // go up
-      for (int i = 0; i < 255; i++) {
-        analogWrite(barrierRpwm, i);
-        delay(8);
-      }
-
-      delay(1500);
-      analogWrite(barrierRpwm, 0);
-      break;
+  // Right barrier
+  _converted_bRH = 143 * _bRH + 10.2; // Relationship between time to raise and height for the right side
+  if (_converted_bRH < 0){
+    _converted_bRH = 0;
+    }
+  if(_converted_bRH > 2296){ // Max height that right barrier could go (16 cm)
+    _converted_bRH = 2296;
   }
 
-  switch (_bLH) {
-    case 0:
-      // do nothing
-      break;
-    case 5:
-      digitalWrite(barrierL, LOW);
-      for (int i = 0; i < 200; i++) {
-        analogWrite(barrierLpwm, i);
-        delay(8);
-      }
-      delay(300);
-      analogWrite(barrierLpwm, 0);
-      break;
-    case 10:
-      digitalWrite(barrierL, LOW); // go up
-      for (int i = 0; i < 255; i++) {
-        analogWrite(barrierLpwm, i);
-        delay(8);
-      }
-
-      delay(1500);
-      analogWrite(barrierLpwm, 0);
-      break;
+  if(_converted_bRH != 0){
+    digitalWrite(barrierR, LOW);
+    analogWrite(barrierRpwm, 255);
+    delay(_converted_bRH); 
+    analogWrite(barrierRpwm, 0);
   }
+
+
+  // Left Barrier
+  _converted_bLH = 122 * _bLH - 7.78; // Relationship between time to raise and height for the left side
+  if (_converted_bLH < 0){
+    _converted_bLH = 0;
+  }
+  if(_converted_bLH > 1943){  // Max height that left barrier could go (16 cm)
+    _converted_bLH = 1943;
+  }
+
+  if(_converted_bLH != 0){
+    
+    digitalWrite(barrierL, LOW);
+    analogWrite(barrierLpwm, 255);
+    delay(_converted_bLH); 
+    analogWrite(barrierLpwm, 0);
+  }
+
+
+
+  // Testing code
+  // for(int testTime = 100; testTime < 2800; testTime){
+  //   Serial.print("Testing: ");
+  //   Serial.print(testTime);
+  //   Serial.print(" ms\n");
+
+  //   digitalWrite(barrierL, LOW);
+  //   analogWrite(barrierLpwm, 255);
+  //   delay(testTime);
+    
+  //   analogWrite(barrierLpwm, 0);
+  //   delay(8000); // Wait for measurement
+  //   digitalWrite(barrierL, HIGH);
+  //   analogWrite(barrierLpwm, 255);
+  //   delay(3000); 
+  //   analogWrite(barrierLpwm, 0);
+  //   delay(3000); 
+  //   testTime = testTime + 100;
+
+  // }
 }
 
 void CTM_base::startTimer() {
@@ -157,6 +211,17 @@ void CTM_base::startTimer() {
 void CTM_base::ActivatePIRStart() {
   if (digitalRead(PIR_Start) && PIRStartPrimed && !PIRStartActivated) { // Check for activated sensor AND that trial is available AND PIR is not already activated
     currentTime = millis();
+
+    if (!ftActive) {
+      Serial.print("Current Trial: ");
+      Serial.print(currTrial);
+      Serial.print("\n");
+    } else {
+      Serial.print("Force Trial: ");
+      Serial.print(currFt);
+      Serial.print("\n");
+    }
+    
     Serial.print("PIR Start Activation Time: ");
     Serial.print(currentTime);
     Serial.print("\n");
@@ -177,6 +242,8 @@ void CTM_base::ActivatePIRMidstem() {
     
     PIRMidstemPrimed = false; // Un-prime PIRMidstem
     PIRMidstemActivated = true; 
+
+    PIREndstemPrimed = true;
     
     //PIRMidstemCloseD1();
   }
@@ -207,7 +274,7 @@ void CTM_base::ActivatePIRLeftPostVertex() {
     PIRLeftPostVertexActivated = true;
   
     PIRLeftPreBarrierPrimed = true;
-    PIRRightPreBarrierPrimed = false;
+    // PIRRightPreBarrierPrimed = false;
   }
 }
 
@@ -220,7 +287,7 @@ void CTM_base::ActivatePIRRightPostVertex() {
   
     PIRRightPostVertexActivated = true;
   
-    PIRLeftPreBarrierPrimed = false;
+    // PIRLeftPreBarrierPrimed = false;
     PIRRightPreBarrierPrimed = true;
   }
 }
@@ -314,48 +381,81 @@ void CTM_base::resetFlags() {
   PIRLeftStartBoxActivated = false;
   PIRRightStartBoxPrimed = false;
   PIRRightStartBoxActivated = false;
-  
-  Serial.print("Flags Reset\n");
+
+  Serial.println("Flags Reset");
+
+  if (currFt <= _nForceTrials) {
+    currFt++;
+    if (currFt > _nForceTrials) {
+      ftActive = false;
+    }
+  } else {
+    Serial.print("Trial Completed: ");
+    Serial.println(currTrial);
+    currTrial++;
+  }
+
+  if (ftActive) {
+    enactForceTrials();
+  }
 }
 
-
-void CTM_base::activatePump(char rew, char pump, long prob) {
+void CTM_base::activatePump(int rew, int pump, float prob) {
   // sends a pulse of a given duration to the reward board to activate pump
   
   int pumpOP;
   int durationHP; // duration with higher probability
   int durationLP; // duration with lower probability
   int chosenDuration;
-  
-  // HR or LR pump?
-  if (rew == 'H') {
+
+  prob = prob * 100;
+
+  /* choose the probability of the duration according to which type of reward is being dispensed */
+  if (rew == 1) {
     durationHP = _HRTime;
     durationLP = _LRTime;
   }
 
-  else if (rew == 'L'){
+  else if (rew == 0){
     durationHP = _LRTime;
     durationLP = _HRTime;
   }
+
   // pick reward with prob% chance
-  long probPicker = random(1);
-  Serial.println(pump);
+  long probPicker = random(0, 101);
+  probPicker = float(probPicker);
+
   if (probPicker <= prob) {
     chosenDuration = durationHP;
+    Serial.println("Higher Probability");
   } else {
     chosenDuration = durationLP;
+    Serial.println("Lower Probability");
   }
+  
+  Serial.print("Chosen duration: ");
+  Serial.print(chosenDuration);
+  Serial.print("\n");
+
   // choose pump
-  if (pump == 'R')
+  if (pump == 1)
     pumpOP = pump1Output;
   
-  else if (pump == 'L') 
+  else if (pump == 0) 
     pumpOP = pump2Output;
 
   digitalWrite(pumpOP, HIGH);
   delay(chosenDuration);
   digitalWrite(pumpOP, LOW);
   delay(20);
+}
+
+void CTM_base::testPump() {
+  digitalWrite(pump1Output, HIGH);
+  digitalWrite(pump2Output, HIGH);
+  delay(10000);
+  digitalWrite(pump1Output, LOW);
+  digitalWrite(pump2Output, LOW);
 }
 
 void CTM_base::PIRStartOpenD1D2D3() {
@@ -371,56 +471,59 @@ void CTM_base::PIRMidstemCloseD1() {
   delay(100);
   PIREndstemPrimed = true; // Prime Endstem
   
-  // Closes the Midstem door after a 2.5s delay
-  delay(2500);
+  // Closes the Midstem door after a specified delay
+  delay(_delayTime);
   digitalWrite(outputD1, LOW); // Close D1
 }
 
 void CTM_base::PIRLPBCloseD2D3D5OpenD4() {
-  delay(1000);
+  activatePump(_leftReward, 0, _prob);
+  delay(_delayTime);
   digitalWrite(outputD2, LOW); // Close D2
   digitalWrite(outputD3, LOW); // Close D3
   digitalWrite(outputD5, LOW); // Close D5
   digitalWrite(outputD1, LOW); // Close D1
 
   digitalWrite(outputD4, HIGH); // Open D4
-  //Serial.print("D2 and D3 Closed\n"); 
-
-  activatePump(_leftReward, 'L', _prob);
-
+  
   delay(100);
   PIRLeftStartBoxPrimed = true; // Prime LSB sensor  
 }
 
 void CTM_base::PIRRPBCloseD3D2D4OpenD5() {
-  delay(1000);
+  activatePump(_rightReward, 1, _prob);
+  delay(_delayTime);
   digitalWrite(outputD2, LOW); // Close D2
   digitalWrite(outputD3, LOW); // Close D3
   digitalWrite(outputD4, LOW); // Close D4
   digitalWrite(outputD1, LOW); // Close D1
 
   digitalWrite(outputD5, HIGH); // Open D5
-  activatePump(_rightReward, 'R', _prob);
+  
 
   delay(100);
   PIRRightStartBoxPrimed = true;
 }
 
 void CTM_base::PIRLSBCloseD4() {
-  delay(3500);
+  delay(_delayTime);
   digitalWrite(outputD4, LOW); // Close D4
-  //Serial.print("D4 Closed\n");
 
-  delay(8000);
+  digitalWrite(outputD2, HIGH);
+  digitalWrite(outputD3, HIGH);
+
+  delay(_ITI);
   resetFlags();
 }
 
 void CTM_base::PIRRSBCloseD5() { 
-  delay(3500);
+  delay(_delayTime);
   digitalWrite(outputD5, LOW); // Close D5
-  //Serial.print("D5 Closed\n");
+  
+  digitalWrite(outputD2, HIGH);
+  digitalWrite(outputD3, HIGH);
 
-  delay(8000);
+  delay(_ITI);
   resetFlags();
 }
 
@@ -460,4 +563,12 @@ void CTM_base::playWithBarriers() {
   }
   delay(3500);
   analogWrite(barrierLpwm, 0);
+}
+
+void CTM_base::enactForceTrials() {
+  if (_ftSide == 0) {
+    digitalWrite(outputD2, LOW); // close D2
+  } else {
+    digitalWrite(outputD3, LOW); // close D3
+  }
 }
