@@ -432,10 +432,32 @@ void CTM_base::activatePump(int rew, int pump, float prob) {
     chosenDuration = durationLP;
     Serial.println("Lower Probability");
   }
+
+  if(chosenDuration == durationHP && durationHP>=durationLP){
+    Serial.print("Large Reward: ");
+    Serial.print(chosenDuration);
+    Serial.print(" ms\n");
+  }
+  else if(chosenDuration == durationLP && durationLP>=durationHP){
+    Serial.print("Large Reward: ");
+    Serial.print(chosenDuration);
+    Serial.print(" ms\n");
+  }
+
+  else if(chosenDuration == durationHP && durationHP<=durationLP){
+    Serial.print("Small Reward: ");
+    Serial.print(chosenDuration);
+    Serial.print(" ms\n");
+  }
+  else if(chosenDuration == durationLP && durationLP<=durationHP){
+    Serial.print("Small Reward: ");
+    Serial.print(chosenDuration);
+    Serial.print(" ms\n");
+  }
   
-  Serial.print("Chosen duration: ");
-  Serial.print(chosenDuration);
-  Serial.print("\n");
+  // Serial.print("Chosen duration: ");
+  // Serial.print(chosenDuration);
+  // Serial.print("\n");
 
   // choose pump
   if (pump == 1)
