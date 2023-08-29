@@ -454,10 +454,6 @@ void CTM_base::activatePump(int rew, int pump, float prob) {
     Serial.print(chosenDuration);
     Serial.print(" ms\n");
   }
-  
-  // Serial.print("Chosen duration: ");
-  // Serial.print(chosenDuration);
-  // Serial.print("\n");
 
   // choose pump
   if (pump == 1)
