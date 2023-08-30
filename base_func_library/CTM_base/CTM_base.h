@@ -51,6 +51,21 @@ class CTM_base {
     // force trial function
     void enactForceTrials();
 
+    // Button Functions
+    void buttonD1Pressed();
+    void buttonD2Pressed();
+    void buttonD3Pressed();
+    void buttonD4Pressed();
+    void buttonD5Pressed();
+
+    void buttonRBarrierPressed();
+    void buttonLBarrierPressed();
+
+    void buttonRPumpPressed();
+    void buttonLPumpPressed();
+
+    void checkButtons();
+
     // testing
     void playWithBarriers();
     void testPump();
@@ -86,6 +101,13 @@ class CTM_base {
 
     // checking if force trials are active
     bool ftActive = false;
+
+    // Door Status for Buttons
+    bool isD1Open = false;
+    bool isD2Open = false;
+    bool isD3Open = false;
+    bool isD4Open = false;
+    bool isD5Open = false;
   
     // =============================
     // PINS
@@ -115,11 +137,24 @@ class CTM_base {
     int PIR_RightPreBarrier = 28;
     int PIR_LeftStartBox = 29;
     int PIR_RightStartBox = 30;
-    
+
     // reward
     int pump1Output = 5;
     int pump2Output = 2;
-    
+
+    // Input Buttons
+    int rightBarrierButton = 50;
+    int leftBarrierButton = 51;
+
+    int startDoorButton = 38;
+    int backRightDoorButton = 46;
+    int backLeftDoorButton = 42;
+    int frontRightDoorButton = 6;
+    int frontLeftDoorButton = 7;
+
+    int rightPumpButton = 4;
+    int leftPumpButton = 3;
+
     // ===================
     // VARIABLE PARAMETERS
     // ===================
@@ -157,6 +192,19 @@ class CTM_base {
 
     // force trial side
     int _ftSide;
+
+    // Button States
+    int startDoorButtonState = 0;
+    int backRightDoorButtonState = 0;
+    int backLeftDoorButtonState = 0;
+    int frontRightDoorButtonState = 0;
+    int frontLeftDoorButtonState = 0;
+
+    int rightBarrierButtonState = 0;
+    int leftBarrierButtonState = 0;
+
+    int rightPumpButtonState = 0;
+    int leftPumpButtonState = 0;
 };
 
 #endif
