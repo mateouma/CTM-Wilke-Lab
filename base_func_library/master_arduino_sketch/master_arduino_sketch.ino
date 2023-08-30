@@ -56,6 +56,8 @@ void loop() {
         mazeProtocol.enactForceTrials();
       }
     }
-  } else if (setupComplete)
+  } else if (setupComplete){
       mazeProtocol.checkSensors();
+      mazeProtocol.checkButtons();
+  }
 }

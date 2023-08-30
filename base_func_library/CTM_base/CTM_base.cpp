@@ -79,12 +79,28 @@ void CTM_base::begin() {
   digitalWrite(PIR_LeftPreBarrier, HIGH);
   digitalWrite(PIR_RightStartBox, HIGH);
   digitalWrite(PIR_LeftStartBox, HIGH);
+
+  // Setup input pins from the buttons
+  pinMode(startDoorButton, INPUT_PULLUP);
+  pinMode(backRightDoorButton, INPUT_PULLUP);
+  pinMode(backLeftDoorButton, INPUT_PULLUP);
+  pinMode(frontRightDoorButton, INPUT_PULLUP);
+  pinMode(frontLeftDoorButton, INPUT_PULLUP);
+
+  pinMode(rightPumpButton, INPUT_PULLUP);
+  pinMode(leftPumpButton, INPUT_PULLUP);
+
+  pinMode(rightBarrierButton, INPUT_PULLUP);
+  pinMode(leftBarrierButton, INPUT_PULLUP);
+
   
   resetBarriers();
   configureBarriers();
 
   digitalWrite(outputD2, HIGH); // Open D2
+  isD2Open = true;
   digitalWrite(outputD3, HIGH); // Open D3
+  isD3Open = true;
 
   delay(500);
 
@@ -432,28 +448,10 @@ void CTM_base::activatePump(int rew, int pump, float prob) {
     chosenDuration = durationLP;
     Serial.println("Lower Probability");
   }
-
-  if(chosenDuration == durationHP && durationHP>=durationLP){
-    Serial.print("Large Reward: ");
-    Serial.print(chosenDuration);
-    Serial.print(" ms\n");
-  }
-  else if(chosenDuration == durationLP && durationLP>=durationHP){
-    Serial.print("Large Reward: ");
-    Serial.print(chosenDuration);
-    Serial.print(" ms\n");
-  }
-
-  else if(chosenDuration == durationHP && durationHP<=durationLP){
-    Serial.print("Small Reward: ");
-    Serial.print(chosenDuration);
-    Serial.print(" ms\n");
-  }
-  else if(chosenDuration == durationLP && durationLP<=durationHP){
-    Serial.print("Small Reward: ");
-    Serial.print(chosenDuration);
-    Serial.print(" ms\n");
-  }
+  
+  Serial.print("Chosen duration: ");
+  Serial.print(chosenDuration);
+  Serial.print("\n");
 
   // choose pump
   if (pump == 1)
@@ -478,8 +476,11 @@ void CTM_base::testPump() {
 
 void CTM_base::PIRStartOpenD1D2D3() {
   digitalWrite(outputD1, HIGH); // Open D1
+  isD1Open = true;
   //digitalWrite(outputD2, HIGH); // Open D2
   //digitalWrite(outputD3, HIGH); // Open D3
+
+
   
   delay(100);
   PIRMidstemPrimed = true; // Prime Midstem sensor
@@ -492,6 +493,7 @@ void CTM_base::PIRMidstemCloseD1() {
   // Closes the Midstem door after a specified delay
   delay(_delayTime);
   digitalWrite(outputD1, LOW); // Close D1
+  isD1Open = false;
 }
 
 void CTM_base::PIRLPBCloseD2D3D5OpenD4() {
@@ -501,8 +503,13 @@ void CTM_base::PIRLPBCloseD2D3D5OpenD4() {
   digitalWrite(outputD3, LOW); // Close D3
   digitalWrite(outputD5, LOW); // Close D5
   digitalWrite(outputD1, LOW); // Close D1
+  isD2Open = false;
+  isD3Open = false;
+  isD5Open = false;
+  isD1Open = false;
 
   digitalWrite(outputD4, HIGH); // Open D4
+  isD4Open = true;
   
   delay(100);
   PIRLeftStartBoxPrimed = true; // Prime LSB sensor  
@@ -515,8 +522,13 @@ void CTM_base::PIRRPBCloseD3D2D4OpenD5() {
   digitalWrite(outputD3, LOW); // Close D3
   digitalWrite(outputD4, LOW); // Close D4
   digitalWrite(outputD1, LOW); // Close D1
+  isD2Open = false;
+  isD3Open = false;
+  isD4Open = false;
+  isD1Open = false;
 
   digitalWrite(outputD5, HIGH); // Open D5
+  isD5Open = true;
   
 
   delay(100);
@@ -526,9 +538,12 @@ void CTM_base::PIRRPBCloseD3D2D4OpenD5() {
 void CTM_base::PIRLSBCloseD4() {
   delay(_delayTime);
   digitalWrite(outputD4, LOW); // Close D4
+  isD4Open = false;
 
   digitalWrite(outputD2, HIGH);
   digitalWrite(outputD3, HIGH);
+  isD2Open = true;
+  isD3Open = true;
 
   delay(_ITI);
   resetFlags();
@@ -537,12 +552,347 @@ void CTM_base::PIRLSBCloseD4() {
 void CTM_base::PIRRSBCloseD5() { 
   delay(_delayTime);
   digitalWrite(outputD5, LOW); // Close D5
+  isD5Open = false;
   
   digitalWrite(outputD2, HIGH);
   digitalWrite(outputD3, HIGH);
+  isD2Open = true;
+  isD3Open = true;
 
   delay(_ITI);
   resetFlags();
+}
+
+
+
+void CTM_base::buttonD1Pressed(){
+  Serial.print("START DOOR BUTTON PRESSED");
+
+  // If the door is open, close it.
+  if(isD1Open == true){
+    Serial.print(" - Closing Door\n");
+    digitalWrite(outputD1, LOW);
+    isD1Open = false;
+    delay(1000);
+
+  }else if(isD1Open == false){
+    // Otherwise, open it.
+    Serial.print(" - Opening Door\n");
+    digitalWrite(outputD1, HIGH);
+    isD1Open = true;
+    delay(1000);
+  }
+}
+
+void CTM_base::buttonD2Pressed(){
+  Serial.print("BACK LEFT DOOR BUTTON PRESSED");
+
+  // If the door is open, close it.
+  if(isD2Open == true){
+    Serial.print(" - Closing Door\n");
+    digitalWrite(outputD2, LOW);
+    isD2Open = false;
+    delay(1000);
+
+  }else if(isD2Open == false){
+    // Otherwise, open it.
+    Serial.print(" - Opening Door\n");
+    digitalWrite(outputD2, HIGH);
+    isD2Open = true;
+    delay(1000);
+
+  }
+  // PIRStartPrimed = false;
+  // PIRStartActivated = false;
+  // PIRMidstemPrimed = false;
+  // PIRMidstemActivated = false;
+  // PIREndstemPrimed = false;
+  // PIREndstemActivated = false;
+  // PIRLeftPostVertexPrimed = false;
+  // PIRLeftPostVertexActivated = false;
+  // PIRRightPostVertexPrimed = false;
+  // PIRRightPostVertexActivated = false;
+  // PIRLeftPreBarrierPrimed = false;
+  // PIRLeftPreBarrierActivated = false;
+  // PIRRightPreBarrierPrimed = false;
+  // PIRRightPreBarrierActivated = false;
+  // PIRLeftStartBoxPrimed = true;
+  // PIRLeftStartBoxActivated = false;
+  // PIRRightStartBoxPrimed = true;
+  // PIRRightStartBoxActivated = false;
+  // Serial.print("MANUAL MODE ENGAGED ");
+  // Serial.print("SENSORS DISREGARDED FOR CURRENT TRIAL\n");
+}
+
+void CTM_base::buttonD3Pressed(){
+  Serial.print("BACK RIGHT DOOR BUTTON PRESSED");
+  
+  // If the door is open, close it.
+  if(isD3Open == true){
+    Serial.print(" - Closing Door\n");
+    digitalWrite(outputD3, LOW);
+    isD3Open = false;
+    delay(1000);
+
+  }else if(isD3Open == false){
+    // Otherwise, open it.
+    Serial.print(" - Opening Door\n");
+    digitalWrite(outputD3, HIGH);
+    isD3Open = true;
+    delay(1000);
+
+  }
+}
+
+void CTM_base::buttonD4Pressed(){
+  Serial.print("FRONT LEFT DOOR BUTTON PRESSED");
+
+  // If the door is open, close it.
+  if(isD4Open == true){
+    Serial.print(" - Closing Door\n");
+    digitalWrite(outputD4, LOW);
+    isD4Open = false;
+    delay(1000);
+
+  }else if(isD4Open == false){
+    // Otherwise, open it.
+    Serial.print(" - Opening Door\n");
+    digitalWrite(outputD4, HIGH);
+    isD4Open = true;
+    delay(1000);
+
+  }
+
+}
+
+void CTM_base::buttonD5Pressed(){
+  Serial.print("FRONT RIGHT DOOR BUTTON PRESSED");
+
+  // If the door is open, close it.
+  if(isD5Open == true){
+    Serial.print(" - Closing Door\n");
+    digitalWrite(outputD5, LOW);
+    isD5Open = false;
+    delay(1000);
+
+  }else if(isD5Open == false){
+    // Otherwise, open it.
+    Serial.print(" - Opening Door\n");
+    digitalWrite(outputD5, HIGH);
+    isD5Open = true;
+    delay(1000);
+
+  }
+
+}
+
+
+
+  // // Right barrier
+  // _converted_bRH = 143 * _bRH + 10.2; // Relationship between time to raise and height for the right side
+  // if (_converted_bRH < 0){
+  //   _converted_bRH = 0;
+  //   }
+  // if(_converted_bRH > 2296){ // Max height that right barrier could go (16 cm)
+  //   _converted_bRH = 2296;
+  // }
+
+  // if(_converted_bRH != 0){
+  //   digitalWrite(barrierR, LOW);
+  //   analogWrite(barrierRpwm, 255);
+  //   delay(_converted_bRH); 
+  //   analogWrite(barrierRpwm, 0);
+  // }
+
+
+  // // Left Barrier
+  // _converted_bLH = 122 * _bLH - 7.78; // Relationship between time to raise and height for the left side
+  // if (_converted_bLH < 0){
+  //   _converted_bLH = 0;
+  // }
+  // if(_converted_bLH > 1943){  // Max height that left barrier could go (16 cm)
+  //   _converted_bLH = 1943;
+  // }
+
+void CTM_base::buttonRBarrierPressed(){
+  unsigned long beginTime = millis();
+  unsigned long timeRan = 0;
+
+  if(_converted_bRH < 2296){
+    Serial.print("RAISING RIGHT BARRIER\n");
+    digitalWrite(barrierR, LOW);
+    analogWrite(barrierRpwm, 255);
+    while(digitalRead(rightBarrierButton) == LOW){
+    }
+    analogWrite(barrierRpwm, 0);
+    timeRan = millis() - beginTime;
+
+    if(_converted_bRH + timeRan > 2296){
+      _converted_bRH = 2296;
+    }else{
+      _converted_bRH = _converted_bRH + timeRan;
+    }
+  }
+  else if(_converted_bRH >= 2296){
+    Serial.print("LOWERING RIGHT BARRIER\n");
+    digitalWrite(barrierR, HIGH);
+    analogWrite(barrierRpwm, 255);
+    while(digitalRead(rightBarrierButton) == LOW){
+    }
+    analogWrite(barrierRpwm, 0);
+    timeRan = millis() - beginTime;
+
+    if(2296 - timeRan < 0){
+      _converted_bRH = 0;
+    }else{
+      _converted_bRH = 2296 - timeRan;
+    }
+  }
+  // float approxHeight = (_converted_bRH - 10.2) / 143;
+  // if(approxHeight > 16){
+  //   approxHeight = 16;
+  // }if(approxHeight < 0){
+  //   approxHeight = 0;
+  // }
+
+  // Serial.print("Approximate Height of Right Barrier: ");
+  // Serial.print(approxHeight);
+  // Serial.print("cm\n");
+
+
+}
+
+void CTM_base::buttonLBarrierPressed(){
+  unsigned long beginTime = millis();
+  unsigned long timeRan = 0;
+
+  if(_converted_bLH < 1943){
+    Serial.print("RAISING LEFT BARRIER\n");
+    digitalWrite(barrierL, LOW);
+    analogWrite(barrierLpwm, 255);
+    while(digitalRead(leftBarrierButton) == LOW){
+    }
+    analogWrite(barrierLpwm, 0);
+    timeRan = millis() - beginTime;
+
+    if(_converted_bLH + timeRan > 1943){
+      _converted_bLH = 1943;
+    }else{
+      _converted_bLH = _converted_bLH + timeRan;
+    }
+  }
+  else if(_converted_bLH >= 1943){
+    Serial.print("LOWERING LEFT BARRIER\n");
+    digitalWrite(barrierL, HIGH);
+    analogWrite(barrierLpwm, 255);
+    while(digitalRead(leftBarrierButton) == LOW){
+    }
+    analogWrite(barrierLpwm, 0);
+    timeRan = millis() - beginTime;
+
+    if(1943 - timeRan < 0){
+      _converted_bLH = 0;
+    }else{
+      _converted_bLH = 1943 - timeRan;
+    }
+  }
+
+}
+
+void CTM_base::buttonRPumpPressed(){
+  Serial.print("BEGIN PUMPING RIGHT SIDE\n");
+  int beginTime = millis();
+
+  while(digitalRead(rightPumpButton) == LOW){
+    digitalWrite(pump1Output, HIGH);
+  }
+
+  digitalWrite(pump1Output, LOW);
+
+  int timeRan = millis() - beginTime;
+
+  Serial.print("Right Pump Ran For: ");
+  Serial.print(timeRan);
+  Serial.print(" ms\n");
+
+
+  Serial.print("END PUMPING RIGHT SIDE\n");
+}
+
+void CTM_base::buttonLPumpPressed(){
+  Serial.print("BEGIN PUMPING LEFT SIDE\n");
+  int beginTime = millis();
+
+  while(digitalRead(leftPumpButton) == LOW){
+    digitalWrite(pump2Output, HIGH);
+  }
+
+  digitalWrite(pump2Output, LOW);
+
+  int timeRan = millis() - beginTime;
+
+  Serial.print("Left Pump Ran For: ");
+  Serial.print(timeRan);
+  Serial.print(" ms\n");
+
+
+  Serial.print("END PUMPING LEFT SIDE\n");
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+void CTM_base::checkButtons() {
+  startDoorButtonState = digitalRead(startDoorButton);
+  backRightDoorButtonState = digitalRead(backRightDoorButton);
+  backLeftDoorButtonState = digitalRead(backLeftDoorButton);
+  frontRightDoorButtonState = digitalRead(frontRightDoorButton);
+  frontLeftDoorButtonState = digitalRead(frontLeftDoorButton);
+
+  rightBarrierButtonState = digitalRead(rightBarrierButton);
+  leftBarrierButtonState = digitalRead(leftBarrierButton);
+
+  rightPumpButtonState = digitalRead(rightPumpButton);
+  leftPumpButtonState = digitalRead(leftPumpButton);  
+
+  if(startDoorButtonState == LOW){
+    buttonD1Pressed();
+  }
+  if(backLeftDoorButtonState == LOW){
+    buttonD2Pressed();
+  }
+  if(backRightDoorButtonState == LOW){
+    buttonD3Pressed();
+  }
+  if(frontLeftDoorButtonState == LOW){
+    buttonD4Pressed();
+  }
+  if(frontRightDoorButtonState == LOW){
+    buttonD5Pressed();
+  }
+
+  if(rightBarrierButtonState == LOW){
+    buttonRBarrierPressed();
+  }
+  if(leftBarrierButtonState == LOW){
+    buttonLBarrierPressed();
+  }
+
+  if(rightPumpButtonState == LOW){
+    buttonRPumpPressed();
+  }
+  if(leftPumpButtonState == LOW){
+    buttonLPumpPressed();
+  }
 }
 
 void CTM_base::playWithBarriers() {
@@ -586,7 +936,9 @@ void CTM_base::playWithBarriers() {
 void CTM_base::enactForceTrials() {
   if (_ftSide == 0) {
     digitalWrite(outputD2, LOW); // close D2
+    isD2Open = false;
   } else {
     digitalWrite(outputD3, LOW); // close D3
+    isD3Open = false;
   }
 }
