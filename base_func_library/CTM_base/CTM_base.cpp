@@ -315,7 +315,8 @@ void CTM_base::ActivatePIRLeftPreBarrier() {
     Serial.print(currentTime);
     Serial.print("\n");
     
-    PIRLeftPreBarrierPrimed = false; // Un-prime PIRLPB
+    // PIRLeftPreBarrierPrimed = false; // Un-prime PIRLPB
+    // PIRRightPreBarrierPrimed = false;
     PIRLeftPreBarrierActivated = true;
     
     PIRLPBCloseD2D3D5OpenD4();
@@ -329,8 +330,8 @@ void CTM_base::ActivatePIRRightPreBarrier() {
     Serial.print(currentTime);
     Serial.print("\n");
     
-    PIRRightPreBarrierPrimed = false; // Un-prime PIRRPB
-    PIRLeftPreBarrierPrimed = false;
+    // PIRRightPreBarrierPrimed = false; // Un-prime PIRRPB
+    // PIRLeftPreBarrierPrimed = false;
     
     PIRRightPreBarrierActivated = true;
     
