@@ -70,6 +70,9 @@ class CTM_base {
     void playWithBarriers();
     void testPump();
 
+    // Trial Counter
+    int currTrial = 0;
+
   private:
     // flags
     bool PIRStartPrimed = true; //set trial available to start
@@ -96,7 +99,6 @@ class CTM_base {
     unsigned long currentTime;
 
     // Trial Counter
-    int currTrial = 1;
     int currFt = 1;
 
     // checking if force trials are active
