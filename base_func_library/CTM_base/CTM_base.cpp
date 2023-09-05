@@ -923,6 +923,54 @@ void CTM_base::checkButtons() {
   }
 }
 
+void CTM_base::testSensors() {
+  if(digitalRead(PIR_Start)){
+    Serial.print("PIR_Start has been activated at time: ");
+    Serial.println(millis());
+    delay(100);
+  }
+  if(digitalRead(PIR_Midstem)){
+    Serial.print("PIR_Midstem has been activated at time: ");
+    Serial.println(millis());
+    delay(100);
+  }
+  if(digitalRead(PIR_Endstem)){
+    Serial.print("PIR_Endstem has been activated at time: ");
+    Serial.println(millis());
+    delay(100);
+  }
+  if(digitalRead(PIR_LeftPostVertex)){
+    Serial.print("PIR_LeftPostVertex has been activated at time: ");
+    Serial.println(millis());
+    delay(100);
+  }
+  if(digitalRead(PIR_RightPostVertex)){
+    Serial.print("PIR_RightPostVertex has been activated at time: ");
+    Serial.println(millis());
+    delay(100);
+  }
+  if(digitalRead(PIR_LeftPreBarrier)){
+    Serial.print("PIR_LeftPreBarrier has been activated at time: ");
+    Serial.println(millis());
+    delay(100);
+  }
+  if(digitalRead(PIR_RightPreBarrier)){
+    Serial.print("PIR_RightPreBarrier has been activated at time: ");
+    Serial.println(millis());
+    delay(100);
+  }
+  if(digitalRead(PIR_LeftStartBox)){
+    Serial.print("PIR_LeftStartBox has been activated at time: ");
+    Serial.println(millis());
+    delay(100);
+  }
+  if(digitalRead(PIR_RightStartBox)){
+    Serial.print("PIR_RightStartBox has been activated at time: ");
+    Serial.println(millis());
+    delay(100);
+  }
+}
+
 void CTM_base::playWithBarriers() {
   /*
    setting barrier to LOW makes it go up
