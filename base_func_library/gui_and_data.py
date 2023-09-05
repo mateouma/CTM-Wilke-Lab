@@ -85,6 +85,9 @@ def data_collection_ready():
     #     if "Comp" in sensor_data_raw_text:
     #         trialsCompleted = int(sensor_data_raw_text[-1])
 
+    lr_choice = 0
+    hr_choice = 0
+
     while True:
         time.sleep(0.1)  # Add a small delay to ensure complete data collection
         getData = ser.readline()
@@ -103,10 +106,19 @@ def data_collection_ready():
                 sensor_data.clear()
             file.close()
 
+        if currentTrial[0] == "HR Side Was Chosen":
+            hr_choice = hr_choice + 1
+        elif currentTrial[0] == "LR Side Was Chosen":
+            lr_choice = lr_choice + 1
+
         if currentTrial[0] == "Trial Completed" and int(currentTrial[1]) == samples:
             break
 
     print("Data collection complete!")
+    print("This mouse picked the HR side in", "{:.2%}".format(hr_choice/samples), "of the trials.")
+    # print("{:.2%}".format(hr_choice/samples))
+    # print(hr_choice/samples*100)
+    # print(" of the trials.")
     file.close()
     ser.close()
     window.destroy()
@@ -121,6 +133,16 @@ def sendParams():
     ITI = entry_ITI.get()
     delayTime = entry_delayTime.get()
     protocol_param_string = f'{hr_pump_time},{lr_pump_time},{l_bar_height},{r_bar_height},{prob},{hr_side},{ITI},{delayTime}'
+    
+    print(protocol_param_string)
+    # Write protocol variables to Serial in form of a string
+    ser.write(protocol_param_string.encode('utf-8'))
+    time.sleep(2)  # Increase the delay before starting data collection
+    data_collection_ready()
+    return
+
+def sendTestParams():    
+    protocol_param_string = "1000,500,0,0,1,1,100,100"
     
     print(protocol_param_string)
     # Write protocol variables to Serial in form of a string
@@ -190,6 +212,8 @@ option_button2.grid(row=5, column=1, padx=10, pady=5)
 # Create the button
 button = tk.Button(window, text="Run Arduino Script", command=lambda: sendParams())
 button.grid(row=10, column=1, padx=10, pady=5)
+button2 = tk.Button(window, text="Run Testing Script", command=lambda: sendTestParams())
+button2.grid(row=11, column=1, padx=10, pady=5)
 #button2 = tk.Button(window, text="Close Window", command=window.destroy())
 #button2.grid(row=7, column=2, padx=10, pady=5)
 
