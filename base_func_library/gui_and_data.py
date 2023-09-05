@@ -4,6 +4,7 @@ from serial.tools import list_ports
 import csv
 import time
 from datetime import datetime
+from sys import platform
 
 
 # Serial connection
@@ -26,12 +27,15 @@ for _, j in enumerate(portsList):
         portVar = "COM" + str(val)
         print(portVar)
 
-# Windows Port Search:
-# portVar = "COM" + str(input("Port: COM"))
-
-# MacOS Port Search:
-# portVar = "/dev/tty.usbmodem21301"
-portVar = "/dev/cu.usbmodem1301"
+if platform == "win32":
+    # Windows Port Search:
+    portVar = "COM" + str(input("Port: COM"))
+elif platform == "darwin":
+    # MacOS Port Search:
+    portVar = "/dev/cu.usbmodem" + str(input("Port: /dev/cu.usbmodem"))
+else:
+    print("Unsupported operating system")
+    quit()
 
 ser.baudrate = 9600
 ser.port = portVar
@@ -69,21 +73,8 @@ def data_collection_ready():
     samples = int(entry_Samples.get())  # How many samples to collect (Set by the GUI)
     sensor_data = []  # Store data
     
-    # trialsCompleted = 0
-    
-    # Collect the samples        
-    # while trialsCompleted < samples:
-    #     time.sleep(0.1)  # Add a small delay to ensure complete data collection
-    #     getData = ser.readline()
-    #     dataString = getData.decode('utf-8')
-    #     data = dataString.strip()
-    #     readings = data.split(",")
-    #     sensor_data.append(readings)
-    #     sensor_data_raw_text = sensor_data[-1][0]
-    #     print(sensor_data_raw_text)
-        
-    #     if "Comp" in sensor_data_raw_text:
-    #         trialsCompleted = int(sensor_data_raw_text[-1])
+    lr_choice = 0
+    hr_choice = 0
 
     while True:
         time.sleep(0.1)  # Add a small delay to ensure complete data collection
@@ -103,10 +94,17 @@ def data_collection_ready():
                 sensor_data.clear()
             file.close()
 
+        if currentTrial[0] == "HR Side Was Chosen":
+            hr_choice = hr_choice + 1
+        elif currentTrial[0] == "LR Side Was Chosen":
+            lr_choice = lr_choice + 1
+
         if currentTrial[0] == "Trial Completed" and int(currentTrial[1]) == samples:
             break
 
     print("Data collection complete!")
+    print("This mouse picked the HR side in", "{:.2%}".format(hr_choice/samples), "of the trials.")
+
     file.close()
     ser.close()
     window.destroy()
@@ -121,6 +119,16 @@ def sendParams():
     ITI = entry_ITI.get()
     delayTime = entry_delayTime.get()
     protocol_param_string = f'{hr_pump_time},{lr_pump_time},{l_bar_height},{r_bar_height},{prob},{hr_side},{ITI},{delayTime}'
+    
+    print(protocol_param_string)
+    # Write protocol variables to Serial in form of a string
+    ser.write(protocol_param_string.encode('utf-8'))
+    time.sleep(2)  # Increase the delay before starting data collection
+    data_collection_ready()
+    return
+
+def sendTestParams():    
+    protocol_param_string = "1000,500,0,0,1,1,100,100"
     
     print(protocol_param_string)
     # Write protocol variables to Serial in form of a string
@@ -190,6 +198,8 @@ option_button2.grid(row=5, column=1, padx=10, pady=5)
 # Create the button
 button = tk.Button(window, text="Run Arduino Script", command=lambda: sendParams())
 button.grid(row=10, column=1, padx=10, pady=5)
+button2 = tk.Button(window, text="Run Testing Script", command=lambda: sendTestParams())
+button2.grid(row=11, column=1, padx=10, pady=5)
 #button2 = tk.Button(window, text="Close Window", command=window.destroy())
 #button2.grid(row=7, column=2, padx=10, pady=5)
 

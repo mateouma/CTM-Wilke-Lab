@@ -431,11 +431,13 @@ void CTM_base::activatePump(int rew, int pump, float prob) {
   if (rew == 1) {
     durationHP = _HRTime;
     durationLP = _LRTime;
+    Serial.println("HR Side Was Chosen");
   }
 
   else if (rew == 0){
     durationHP = _LRTime;
     durationLP = _HRTime;
+    Serial.println("LR Side Was Chosen");
   }
 
   // pick reward with prob% chance
@@ -444,15 +446,40 @@ void CTM_base::activatePump(int rew, int pump, float prob) {
 
   if (probPicker <= prob) {
     chosenDuration = durationHP;
-    Serial.println("Higher Probability");
+    // Serial.println("Higher Probability");
   } else {
     chosenDuration = durationLP;
-    Serial.println("Lower Probability");
+    // Serial.println("Lower Probability");
+  }
+
+
+
+
+  if(chosenDuration == durationHP && durationHP>=durationLP){
+    Serial.print("Large Reward: ");
+    Serial.print(chosenDuration);
+    Serial.print(" ms\n");
+  }
+  else if(chosenDuration == durationLP && durationLP>=durationHP){
+    Serial.print("Large Reward: ");
+    Serial.print(chosenDuration);
+    Serial.print(" ms\n");
+  }
+
+  else if(chosenDuration == durationHP && durationHP<=durationLP){
+    Serial.print("Small Reward: ");
+    Serial.print(chosenDuration);
+    Serial.print(" ms\n");
+  }
+  else if(chosenDuration == durationLP && durationLP<=durationHP){
+    Serial.print("Small Reward: ");
+    Serial.print(chosenDuration);
+    Serial.print(" ms\n");
   }
   
-  Serial.print("Chosen duration: ");
-  Serial.print(chosenDuration);
-  Serial.print("\n");
+  // Serial.print("Chosen duration: ");
+  // Serial.print(chosenDuration);
+  // Serial.print("\n");
 
   // choose pump
   if (pump == 1)
