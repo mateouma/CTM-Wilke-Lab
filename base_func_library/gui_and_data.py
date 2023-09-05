@@ -31,7 +31,7 @@ for _, j in enumerate(portsList):
 
 # MacOS Port Search:
 # portVar = "/dev/tty.usbmodem21301"
-portVar = "/dev/cu.usbmodem11301"
+portVar = "/dev/cu.usbmodem1301"
 
 ser.baudrate = 9600
 ser.port = portVar
