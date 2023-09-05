@@ -4,6 +4,7 @@ from serial.tools import list_ports
 import csv
 import time
 from datetime import datetime
+from sys import platform
 
 
 # Serial connection
@@ -26,12 +27,15 @@ for _, j in enumerate(portsList):
         portVar = "COM" + str(val)
         print(portVar)
 
-# Windows Port Search:
-# portVar = "COM" + str(input("Port: COM"))
-
-# MacOS Port Search:
-# portVar = "/dev/tty.usbmodem21301"
-portVar = "/dev/cu.usbmodem1301"
+if platform == "win32":
+    # Windows Port Search:
+    portVar = "COM" + str(input("Port: COM"))
+elif platform == "darwin":
+    # MacOS Port Search:
+    portVar = "/dev/cu.usbmodem" + str(input("Port: /dev/cu.usbmodem"))
+else:
+    print("Unsupported operating system")
+    quit()
 
 ser.baudrate = 9600
 ser.port = portVar
@@ -69,22 +73,6 @@ def data_collection_ready():
     samples = int(entry_Samples.get())  # How many samples to collect (Set by the GUI)
     sensor_data = []  # Store data
     
-    # trialsCompleted = 0
-    
-    # Collect the samples        
-    # while trialsCompleted < samples:
-    #     time.sleep(0.1)  # Add a small delay to ensure complete data collection
-    #     getData = ser.readline()
-    #     dataString = getData.decode('utf-8')
-    #     data = dataString.strip()
-    #     readings = data.split(",")
-    #     sensor_data.append(readings)
-    #     sensor_data_raw_text = sensor_data[-1][0]
-    #     print(sensor_data_raw_text)
-        
-    #     if "Comp" in sensor_data_raw_text:
-    #         trialsCompleted = int(sensor_data_raw_text[-1])
-
     lr_choice = 0
     hr_choice = 0
 
@@ -116,9 +104,7 @@ def data_collection_ready():
 
     print("Data collection complete!")
     print("This mouse picked the HR side in", "{:.2%}".format(hr_choice/samples), "of the trials.")
-    # print("{:.2%}".format(hr_choice/samples))
-    # print(hr_choice/samples*100)
-    # print(" of the trials.")
+
     file.close()
     ser.close()
     window.destroy()
