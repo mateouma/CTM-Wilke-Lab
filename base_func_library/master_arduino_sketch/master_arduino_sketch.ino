@@ -73,7 +73,14 @@ void loop() {
       mazeProtocol.configureParams(hr_pump_time, lr_pump_time, r_bar_height, l_bar_height, prob, hr_side, ITI, delayTime, nForceTrials, ftSide);
       mazeProtocol.begin();
       mazeProtocol.printConfigParams();
-      lcd.clear();
+//      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("Current Trial:  ");
+      lcd.setCursor(0, 1);
+//      lcd.setCursor(0, 0);
+//      lcd.print("                ");
+//      lcd.setCursor(0, 1);
+//      lcd.print("                ");
       setupComplete = true;
       delay(2000);
       if (nForceTrials > 0) {
@@ -90,17 +97,22 @@ void loop() {
       mazeProtocol.checkButtons();
       count++;
 
-      // Trial_Count++;
       if(count > 10000){
-//         lcd.print("Hello, World!!!");
+//        lcd.clear();
+//          lcd.setCursor(0, 1);
+//         lcd.print("Hello");
         // lcd.setCursor(0, 1);
         // print the number of seconds since reset:
         // lcd.print(millis() / 1000);
-        lcd.clear();
+//        lcd.setCursor(0, 0);
+//        lcd.print("                ");
+//        lcd.setCursor(0, 1);
+//        lcd.print("                ");
+//        lcd.clear();
 //        lcd.setCursor(0, 0);        
-        lcd.print("Current Trial:");
+//        lcd.print("Current Trial:");
         lcd.setCursor(0, 1);
-        lcd.print(mazeProtocol.currTrial);
+        lcd.print(String(mazeProtocol.currTrial));
 //        Serial.println("Current Trial:");
 //        Serial.println(mazeProtocol.currTrial);
         

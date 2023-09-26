@@ -431,11 +431,13 @@ void CTM_base::activatePump(int rew, int pump, float prob) {
   if (rew == 1) {
     durationHP = _HRTime;
     durationLP = _LRTime;
+    Serial.println("HR Side Was Chosen");
   }
 
   else if (rew == 0){
     durationHP = _LRTime;
     durationLP = _HRTime;
+    Serial.println("LR Side Was Chosen");
   }
 
   // pick reward with prob% chance
@@ -444,15 +446,40 @@ void CTM_base::activatePump(int rew, int pump, float prob) {
 
   if (probPicker <= prob) {
     chosenDuration = durationHP;
-    Serial.println("Higher Probability");
+    // Serial.println("Higher Probability");
   } else {
     chosenDuration = durationLP;
-    Serial.println("Lower Probability");
+    // Serial.println("Lower Probability");
+  }
+
+
+
+
+  if(chosenDuration == durationHP && durationHP>=durationLP){
+    Serial.print("Large Reward: ");
+    Serial.print(chosenDuration);
+    Serial.print(" ms\n");
+  }
+  else if(chosenDuration == durationLP && durationLP>=durationHP){
+    Serial.print("Large Reward: ");
+    Serial.print(chosenDuration);
+    Serial.print(" ms\n");
+  }
+
+  else if(chosenDuration == durationHP && durationHP<=durationLP){
+    Serial.print("Small Reward: ");
+    Serial.print(chosenDuration);
+    Serial.print(" ms\n");
+  }
+  else if(chosenDuration == durationLP && durationLP<=durationHP){
+    Serial.print("Small Reward: ");
+    Serial.print(chosenDuration);
+    Serial.print(" ms\n");
   }
   
-  Serial.print("Chosen duration: ");
-  Serial.print(chosenDuration);
-  Serial.print("\n");
+  // Serial.print("Chosen duration: ");
+  // Serial.print(chosenDuration);
+  // Serial.print("\n");
 
   // choose pump
   if (pump == 1)
@@ -894,6 +921,54 @@ void CTM_base::checkButtons() {
   }
   if(leftPumpButtonState == LOW){
     buttonLPumpPressed();
+  }
+}
+
+void CTM_base::testSensors() {
+  if(digitalRead(PIR_Start)){
+    Serial.print("PIR_Start has been activated at time: ");
+    Serial.println(millis());
+    delay(100);
+  }
+  if(digitalRead(PIR_Midstem)){
+    Serial.print("PIR_Midstem has been activated at time: ");
+    Serial.println(millis());
+    delay(100);
+  }
+  if(digitalRead(PIR_Endstem)){
+    Serial.print("PIR_Endstem has been activated at time: ");
+    Serial.println(millis());
+    delay(100);
+  }
+  if(digitalRead(PIR_LeftPostVertex)){
+    Serial.print("PIR_LeftPostVertex has been activated at time: ");
+    Serial.println(millis());
+    delay(100);
+  }
+  if(digitalRead(PIR_RightPostVertex)){
+    Serial.print("PIR_RightPostVertex has been activated at time: ");
+    Serial.println(millis());
+    delay(100);
+  }
+  if(digitalRead(PIR_LeftPreBarrier)){
+    Serial.print("PIR_LeftPreBarrier has been activated at time: ");
+    Serial.println(millis());
+    delay(100);
+  }
+  if(digitalRead(PIR_RightPreBarrier)){
+    Serial.print("PIR_RightPreBarrier has been activated at time: ");
+    Serial.println(millis());
+    delay(100);
+  }
+  if(digitalRead(PIR_LeftStartBox)){
+    Serial.print("PIR_LeftStartBox has been activated at time: ");
+    Serial.println(millis());
+    delay(100);
+  }
+  if(digitalRead(PIR_RightStartBox)){
+    Serial.print("PIR_RightStartBox has been activated at time: ");
+    Serial.println(millis());
+    delay(100);
   }
 }
 

@@ -69,6 +69,7 @@ class CTM_base {
     // testing
     void playWithBarriers();
     void testPump();
+    void testSensors();
 
     // Trial Counter
     int currTrial = 0;
