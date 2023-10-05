@@ -495,11 +495,47 @@ void CTM_base::activatePump(int rew, int pump, float prob) {
 }
 
 void CTM_base::testPump() {
-  digitalWrite(pump1Output, HIGH);
-  digitalWrite(pump2Output, HIGH);
-  delay(10000);
-  digitalWrite(pump1Output, LOW);
-  digitalWrite(pump2Output, LOW);
+  // for(int i = 0; i<=10000; i+=500){
+  //   Serial.print("Testing Pump 1: ");
+  //   Serial.print(i);
+  //   Serial.print(" ms\n");
+  //   digitalWrite(pump1Output, HIGH);
+  //   delay(i);
+  //   digitalWrite(pump1Output, LOW);
+  //   delay(30000);
+  // }
+  // for(int i = 0; i<=10000; i+=500){
+  //   Serial.print("Testing Pump 2: ");
+  //   Serial.print(i);
+  //   Serial.print(" ms\n");
+  //   digitalWrite(pump2Output, HIGH);
+  //   delay(i);
+  //   digitalWrite(pump2Output, LOW);
+  //   delay(30000);
+  // }
+  Serial.print("Testing Pump 2: ");
+    Serial.print("5000");
+    Serial.print(" ms\n");
+    digitalWrite(pump2Output, HIGH);
+    delay(5000);
+    digitalWrite(pump2Output, LOW);
+    delay(30000);
+
+    Serial.print("Testing Pump 2: ");
+    Serial.print("8000");
+    Serial.print(" ms\n");
+    digitalWrite(pump2Output, HIGH);
+    delay(8000);
+    digitalWrite(pump2Output, LOW);
+    delay(30000);
+
+    Serial.print("Testing Pump 2: ");
+    Serial.print("10000");
+    Serial.print(" ms\n");
+    digitalWrite(pump2Output, HIGH);
+    delay(10000);
+    digitalWrite(pump2Output, LOW);
+    delay(30000);
 }
 
 void CTM_base::PIRStartOpenD1D2D3() {
