@@ -11,11 +11,11 @@ CTM_base::CTM_base() {
 
 }
 
-void CTM_base::configureParams(int HRTime, int LRTime, 
-                               int barrierRHeight, int barrierLHeight, 
-                               float prob, int HRside, 
-                               int ITI, int delayTime,
-                               int nForceTrials, int ftSide) {
+void CTM_base::configureParams(int HRTime, int LRTime,
+                         int barrierRHeight, int barrierLHeight,
+                         float prob_HR, float prob_LR,
+                         int HRside, int ITI, int delayTime,
+                         int nForceTrials, int ftSide) {
   // HIGH REWARD = 1
   // LOW REWARD = 0
 
@@ -24,7 +24,8 @@ void CTM_base::configureParams(int HRTime, int LRTime,
   _bRH = barrierRHeight;
   _bLH = barrierLHeight;
   _HRside = HRside;
-  _prob = prob;
+  _prob_HR = prob_HR;
+  _prob_LR = prob_LR;
   _ITI = ITI;
   _delayTime = delayTime;
   _nForceTrials = nForceTrials;
@@ -135,8 +136,12 @@ void CTM_base::printConfigParams() {
   Serial.print(_LRTime);
   Serial.print(" ms \n");
 
-  Serial.print("Reward Probability");
-  Serial.print(_prob);
+  Serial.print("HR Reward Probability on HR Side: ");
+  Serial.print(_prob_HR);
+  Serial.print("\n");
+
+  Serial.print("HR Reward Probability on LR Side: ");
+  Serial.print(_prob_LR);
   Serial.print("\n");
 }
 
@@ -417,26 +422,29 @@ void CTM_base::resetFlags() {
   }
 }
 
-void CTM_base::activatePump(int rew, int pump, float prob) {
+void CTM_base::activatePump(int rew, int pump, float prob_HR, float prob_LR) {
   // sends a pulse of a given duration to the reward board to activate pump
   
   int pumpOP;
   int durationHP; // duration with higher probability
   int durationLP; // duration with lower probability
   int chosenDuration;
-
-  prob = prob * 100;
+  int prob;
+  durationHP = _HRTime;
+  durationLP = _LRTime;
 
   /* choose the probability of the duration according to which type of reward is being dispensed */
   if (rew == 1) {
-    durationHP = _HRTime;
-    durationLP = _LRTime;
+    // durationHP = _HRTime;
+    // durationLP = _LRTime;
+    prob = prob_HR * 100;
     Serial.println("HR Side Was Chosen");
   }
 
   else if (rew == 0){
-    durationHP = _LRTime;
-    durationLP = _HRTime;
+    // durationHP = _LRTime;
+    // durationLP = _HRTime;
+    prob = prob_LR * 100;
     Serial.println("LR Side Was Chosen");
   }
 
@@ -495,11 +503,47 @@ void CTM_base::activatePump(int rew, int pump, float prob) {
 }
 
 void CTM_base::testPump() {
-  digitalWrite(pump1Output, HIGH);
-  digitalWrite(pump2Output, HIGH);
-  delay(10000);
-  digitalWrite(pump1Output, LOW);
-  digitalWrite(pump2Output, LOW);
+  // for(int i = 0; i<=10000; i+=500){
+  //   Serial.print("Testing Pump 1: ");
+  //   Serial.print(i);
+  //   Serial.print(" ms\n");
+  //   digitalWrite(pump1Output, HIGH);
+  //   delay(i);
+  //   digitalWrite(pump1Output, LOW);
+  //   delay(30000);
+  // }
+  // for(int i = 0; i<=10000; i+=500){
+  //   Serial.print("Testing Pump 2: ");
+  //   Serial.print(i);
+  //   Serial.print(" ms\n");
+  //   digitalWrite(pump2Output, HIGH);
+  //   delay(i);
+  //   digitalWrite(pump2Output, LOW);
+  //   delay(30000);
+  // }
+  Serial.print("Testing Pump 2: ");
+    Serial.print("5000");
+    Serial.print(" ms\n");
+    digitalWrite(pump2Output, HIGH);
+    delay(5000);
+    digitalWrite(pump2Output, LOW);
+    delay(30000);
+
+    Serial.print("Testing Pump 2: ");
+    Serial.print("8000");
+    Serial.print(" ms\n");
+    digitalWrite(pump2Output, HIGH);
+    delay(8000);
+    digitalWrite(pump2Output, LOW);
+    delay(30000);
+
+    Serial.print("Testing Pump 2: ");
+    Serial.print("10000");
+    Serial.print(" ms\n");
+    digitalWrite(pump2Output, HIGH);
+    delay(10000);
+    digitalWrite(pump2Output, LOW);
+    delay(30000);
 }
 
 void CTM_base::PIRStartOpenD1D2D3() {
@@ -525,7 +569,7 @@ void CTM_base::PIRMidstemCloseD1() {
 }
 
 void CTM_base::PIRLPBCloseD2D3D5OpenD4() {
-  activatePump(_leftReward, 0, _prob);
+  activatePump(_leftReward, 0, _prob_HR, _prob_LR);
   delay(_delayTime);
   digitalWrite(outputD2, LOW); // Close D2
   digitalWrite(outputD3, LOW); // Close D3
@@ -544,7 +588,7 @@ void CTM_base::PIRLPBCloseD2D3D5OpenD4() {
 }
 
 void CTM_base::PIRRPBCloseD3D2D4OpenD5() {
-  activatePump(_rightReward, 1, _prob);
+  activatePump(_rightReward, 1, _prob_HR, _prob_LR);
   delay(_delayTime);
   digitalWrite(outputD2, LOW); // Close D2
   digitalWrite(outputD3, LOW); // Close D3
