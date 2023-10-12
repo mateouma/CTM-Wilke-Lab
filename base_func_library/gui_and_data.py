@@ -6,6 +6,35 @@ import time
 from datetime import datetime
 from sys import platform
 
+# # This doesn't work ... need to fix.
+
+# import signal
+# import sys
+
+# # Signal handler
+# def signal_handler(sig, frame):
+#     signal.signal(signal.SIGINT, original_sigint)
+
+#     try:
+#         if input("\nReally quit? (y/n)> ").lower().startswith('y'):
+#             sys.exit(1)
+#     except KeyboardInterrupt:
+#         print("Ok ok, quitting")
+#         sys.exit(1)
+
+#     # val = str(input('\n\nAre you sure that you want to close out of the trial and end data collection? [y/n]\n\n'))
+#     # if val == "y" or val == "yes":
+#     #     print("Exiting...\n\n")
+#     #     sys.exit(0)
+#     # if val == "n" or val == "no":
+#     #     print("Resuming...\n\n")
+
+#     signal.signal(signal.SIGINT, signal_handler)
+
+
+# original_sigint = signal.getsignal(signal.SIGINT)
+# signal.signal(signal.SIGINT, signal_handler)
+
 
 # Serial connection
 # Declare serial port variables
