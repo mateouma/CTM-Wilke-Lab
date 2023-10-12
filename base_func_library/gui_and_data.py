@@ -5,6 +5,9 @@ import csv
 import time
 from datetime import datetime
 from sys import platform
+import subprocess
+if platform == "win32":
+    import pywinauto
 
 # # This doesn't work ... need to fix.
 
@@ -105,6 +108,20 @@ def data_collection_ready():
     lr_choice = 0
     hr_choice = 0
 
+    # Starting camera app:
+    if platform == "win32":
+        subprocess.run('start microsoft.windows.camera:', shell=True)
+        time.sleep(2)
+        desktop = pywinauto.Desktop(backend="uia")
+        cam = desktop['Camera']
+        # make sure in video mode
+        if cam.child_window(title="Switch to Video mode", auto_id="CaptureButton_1", control_type="Button").exists():
+            cam.child_window(title="Switch to Video mode", auto_id="CaptureButton_1", control_type="Button").click()
+        time.sleep(1)
+        # start then stop video
+        cam.child_window(title="Take Video", auto_id="CaptureButton_1", control_type="Button").click()
+        print("Started Recording!")
+
     while True:
         time.sleep(0.1)  # Add a small delay to ensure complete data collection
         getData = ser.readline()
@@ -133,6 +150,12 @@ def data_collection_ready():
 
     print("Data collection complete!")
     print("This mouse picked the HR side in", "{:.2%}".format(hr_choice/samples), "of the trials.")
+
+    # Stop recording and close out the camera.
+    if platform == "win32":
+        cam.child_window(title="Stop taking Video", auto_id="CaptureButton_1", control_type="Button").click()
+        subprocess.run('Taskkill /IM WindowsCamera.exe /F', shell=True)  # close camera app
+        print('Recorded successfully!')
 
     file.close()
     ser.close()
