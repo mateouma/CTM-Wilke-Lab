@@ -166,11 +166,12 @@ def sendParams():
     lr_pump_time = entry_time2.get()
     l_bar_height = entry_height1.get()
     r_bar_height = entry_height2.get()
-    prob = entry_prob.get()
+    prob_HR = entry_prob_HR.get()
+    prob_LR = entry_prob_LR.get()
     hr_side = option_var.get()
     ITI = entry_ITI.get()
     delayTime = entry_delayTime.get()
-    protocol_param_string = f'{hr_pump_time},{lr_pump_time},{l_bar_height},{r_bar_height},{prob},{hr_side},{ITI},{delayTime}'
+    protocol_param_string = f'{hr_pump_time},{lr_pump_time},{l_bar_height},{r_bar_height},{prob_HR},{prob_LR},{hr_side},{ITI},{delayTime}'
     
     print(protocol_param_string)
     # Write protocol variables to Serial in form of a string
@@ -180,7 +181,7 @@ def sendParams():
     return
 
 def sendTestParams():    
-    protocol_param_string = "1000,500,0,0,1,1,100,100"
+    protocol_param_string = "1000,500,0,0,1,0,1,100,100"
     
     print(protocol_param_string)
     # Write protocol variables to Serial in form of a string
@@ -202,15 +203,16 @@ tk.Label(window, text="HR Pump Time (ms):").grid(row=0, column=0, padx=10, pady=
 tk.Label(window, text="LR Pump Time (ms):").grid(row=1, column=0, padx=10, pady=5)
 tk.Label(window, text="Left Barrier Height (cm):").grid(row=2, column=0, padx=10, pady=5)
 tk.Label(window, text="Right Barrier Height (cm):").grid(row=3, column=0, padx=10, pady=5)
-tk.Label(window, text="Probability:").grid(row=4, column=0, padx=10, pady=5)
-tk.Label(window, text="HR Side:").grid(row=5, column=0, padx=10, pady=5)
-tk.Label(window, text="Inter-trial Interval:").grid(row=6, column=0, padx=10, pady=5)
-tk.Label(window, text="Door Close Time Delay (ms):").grid(row=7, column=0, padx=10, pady=5)
-tk.Label(window, text="Number of Samples:").grid(row=8, column=0, padx=10, pady=5)
-tk.Label(window, text="File Name:").grid(row=9, column=0, padx=10, pady=5)
-tk.Label(window, text=".csv").grid(row=9, column=2, padx=10, pady=5)
+tk.Label(window, text="HR Probability on HR Side:").grid(row=4, column=0, padx=10, pady=5)
+tk.Label(window, text="HR Probability on LR Side:").grid(row=5, column=0, padx=10, pady=5)
+tk.Label(window, text="HR Side:").grid(row=6, column=0, padx=10, pady=5)
+tk.Label(window, text="Inter-trial Interval:").grid(row=7, column=0, padx=10, pady=5)
+tk.Label(window, text="Door Close Time Delay (ms):").grid(row=8, column=0, padx=10, pady=5)
+tk.Label(window, text="Number of Samples:").grid(row=9, column=0, padx=10, pady=5)
+tk.Label(window, text="File Name:").grid(row=10, column=0, padx=10, pady=5)
+tk.Label(window, text=".csv").grid(row=10, column=2, padx=10, pady=5)
 result_label = tk.Label(window, text="")
-result_label.grid(row=10, column=0, padx=10, pady=5, columnspan=2)
+result_label.grid(row=11, column=0, padx=10, pady=5, columnspan=2)
 
 # Create the entry fields
 entry_time1 = tk.Entry(window)
@@ -221,16 +223,18 @@ entry_height1 = tk.Entry(window)
 entry_height1.grid(row=2, column=1, padx=10, pady=5)
 entry_height2 = tk.Entry(window)
 entry_height2.grid(row=3, column=1, padx=10, pady=5)
-entry_prob = tk.Entry(window)
-entry_prob.grid(row=4, column=1, padx=10, pady=5)
+entry_prob_HR = tk.Entry(window)
+entry_prob_HR.grid(row=4, column=1, padx=10, pady=5)
+entry_prob_LR = tk.Entry(window)
+entry_prob_LR.grid(row=5, column=1, padx=10, pady=5)
 entry_ITI = tk.Entry(window)
-entry_ITI.grid(row=6, column=1, padx=10, pady=5)
+entry_ITI.grid(row=7, column=1, padx=10, pady=5)
 entry_delayTime = tk.Entry(window)
-entry_delayTime.grid(row=7, column=1, padx=10, pady=5)
+entry_delayTime.grid(row=8, column=1, padx=10, pady=5)
 entry_Samples = tk.Entry(window)
-entry_Samples.grid(row=8, column=1, padx=10, pady=5)
+entry_Samples.grid(row=9, column=1, padx=10, pady=5)
 entry_file_name = tk.Entry(window)
-entry_file_name.grid(row=9, column=1, padx=10, pady=5)
+entry_file_name.grid(row=10, column=1, padx=10, pady=5)
 
 # Create the option buttons
 option_var = tk.StringVar()
@@ -243,15 +247,15 @@ def set_option_2():
     option_var.set(0) # Set the Hight side to Left.
 
 option_button1 = tk.Radiobutton(window, text="Right", variable=option_var, value=1, command=set_option_1)
-option_button1.grid(row=5, column=2, padx=10, pady=5)
+option_button1.grid(row=6, column=2, padx=10, pady=5)
 option_button2 = tk.Radiobutton(window, text="Left", variable=option_var, value=0, command=set_option_2)
-option_button2.grid(row=5, column=1, padx=10, pady=5)
+option_button2.grid(row=6, column=1, padx=10, pady=5)
 
 # Create the button
 button = tk.Button(window, text="Run Arduino Script", command=lambda: sendParams())
-button.grid(row=10, column=1, padx=10, pady=5)
+button.grid(row=11, column=1, padx=10, pady=5)
 button2 = tk.Button(window, text="Run Testing Script", command=lambda: sendTestParams())
-button2.grid(row=11, column=1, padx=10, pady=5)
+button2.grid(row=12, column=1, padx=10, pady=5)
 #button2 = tk.Button(window, text="Close Window", command=window.destroy())
 #button2.grid(row=7, column=2, padx=10, pady=5)
 
