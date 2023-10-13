@@ -76,6 +76,39 @@ ser.open()
 # =======================
 # Functions
 # =======================
+def begin_recording():
+    # Starting camera app:
+    if platform == "win32":
+        subprocess.run('start microsoft.windows.camera:', shell=True)
+        time.sleep(2)
+        desktop = pywinauto.Desktop(backend="uia")
+        cam = desktop['Camera']
+        # make sure in video mode
+        if cam.child_window(title="Switch to video mode", auto_id="CaptureButton_1", control_type="Button").exists():
+            cam.child_window(title="Switch to video mode", auto_id="CaptureButton_1", control_type="Button").click()
+        time.sleep(1)
+        # start then stop video
+        if cam.child_window(title="Take video", auto_id="CaptureButton_1", control_type="Button").exists():
+            cam.child_window(title="Take video", auto_id="CaptureButton_1", control_type="Button").click()
+            print("Started Recording!")
+        else:
+            print("\n\n\nFAILED TO START RECORDING, PLEASE RECORD MANUALLY!!!\n\n\n")
+
+def end_recording():
+    # Stop recording and close out the camera.
+    if platform == "win32":
+        desktop = pywinauto.Desktop(backend="uia")
+        cam = desktop['Camera']
+        if cam.child_window(title="Stop taking video", auto_id="CaptureButton_1", control_type="Button").exists():
+            cam.child_window(title="Stop taking video", auto_id="CaptureButton_1", control_type="Button").click()
+            time.sleep(2)
+            subprocess.run('Taskkill /IM WindowsCamera.exe /F', shell=True)  # close camera app
+            print('Recorded successfully!')
+        else:
+            print("Issue with recording, likely turned off manually. Not guaranteed to be saved.")
+            time.sleep(2)
+            subprocess.run('Taskkill /IM WindowsCamera.exe /F', shell=True)  # close camera app
+
 
 def data_collection_ready():
     # Display data to terminal
@@ -108,20 +141,6 @@ def data_collection_ready():
     lr_choice = 0
     hr_choice = 0
 
-    # Starting camera app:
-    if platform == "win32":
-        subprocess.run('start microsoft.windows.camera:', shell=True)
-        time.sleep(2)
-        desktop = pywinauto.Desktop(backend="uia")
-        cam = desktop['Camera']
-        # make sure in video mode
-        if cam.child_window(title="Switch to Video mode", auto_id="CaptureButton_1", control_type="Button").exists():
-            cam.child_window(title="Switch to Video mode", auto_id="CaptureButton_1", control_type="Button").click()
-        time.sleep(1)
-        # start then stop video
-        cam.child_window(title="Take Video", auto_id="CaptureButton_1", control_type="Button").click()
-        print("Started Recording!")
-
     while True:
         time.sleep(0.1)  # Add a small delay to ensure complete data collection
         getData = ser.readline()
@@ -148,15 +167,10 @@ def data_collection_ready():
         if currentTrial[0] == "Trial Completed" and int(currentTrial[1]) == samples:
             break
 
-    print("Data collection complete!")
-    print("This mouse picked the HR side in", "{:.2%}".format(hr_choice/samples), "of the trials.")
-
-    # Stop recording and close out the camera.
-    if platform == "win32":
-        cam.child_window(title="Stop taking Video", auto_id="CaptureButton_1", control_type="Button").click()
-        subprocess.run('Taskkill /IM WindowsCamera.exe /F', shell=True)  # close camera app
-        print('Recorded successfully!')
-
+    print("\n\n\nData collection complete!")
+    print("This mouse picked the HR side in", "{:.2%}".format(hr_choice/samples), "of the trials.\n\n\n")
+    time.sleep(2)
+    end_recording()
     file.close()
     ser.close()
     window.destroy()
@@ -176,7 +190,8 @@ def sendParams():
     print(protocol_param_string)
     # Write protocol variables to Serial in form of a string
     ser.write(protocol_param_string.encode('utf-8'))
-    time.sleep(2)  # Increase the delay before starting data collection
+    begin_recording()
+    time.sleep(5)  # Increase the delay before starting data collection
     data_collection_ready()
     return
 
@@ -187,6 +202,7 @@ def sendTestParams():
     # Write protocol variables to Serial in form of a string
     ser.write(protocol_param_string.encode('utf-8'))
     time.sleep(2)  # Increase the delay before starting data collection
+    begin_recording()
     data_collection_ready()
     return
 
