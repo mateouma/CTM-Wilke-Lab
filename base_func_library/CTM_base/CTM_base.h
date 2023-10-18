@@ -70,6 +70,7 @@ class CTM_base {
     void playWithBarriers();
     void testPump();
     void testSensors();
+    void printFlags();
 
   private:
     // flags

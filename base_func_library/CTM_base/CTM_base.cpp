@@ -367,7 +367,7 @@ void CTM_base::ActivatePIRRightStartBox() {
     
     PIRRightStartBoxPrimed = false;
     PIRRightStartBoxActivated = true;
-    
+
     PIRRSBCloseD5(); // Close D5 function
   }
 }
@@ -382,6 +382,45 @@ void CTM_base::checkSensors() {
   ActivatePIRRightPreBarrier();
   ActivatePIRLeftStartBox();
   ActivatePIRRightStartBox();
+}
+
+void CTM_base::printFlags() {
+  Serial.print("PIRStartPrimed: ");
+  Serial.println(PIRStartPrimed);
+  Serial.print("PIRStartActivated: ");
+  Serial.println(PIRStartActivated);
+  Serial.print("PIRMidstemPrimed: ");
+  Serial.println(PIRMidstemPrimed);
+  Serial.print("PIRMidstemActivated: ");
+  Serial.println(PIRMidstemActivated);
+  Serial.print("PIREndstemPrimed: ");
+  Serial.println(PIREndstemPrimed);
+  Serial.print("PIREndstemActivated: ");
+  Serial.println(PIREndstemActivated);
+  Serial.print("PIRLeftPostVertexPrimed: ");
+  Serial.println(PIRLeftPostVertexPrimed);
+  Serial.print("PIRLeftPostVertexActivated: ");
+  Serial.println(PIRLeftPostVertexActivated);
+  Serial.print("PIRRightPostVertexPrimed: ");
+  Serial.println(PIRRightPostVertexPrimed);
+  Serial.print("PIRRightPostVertexActivated: ");
+  Serial.println(PIRRightPostVertexActivated);
+  Serial.print("PIRLeftPreBarrierPrimed: ");
+  Serial.println(PIRLeftPreBarrierPrimed);
+  Serial.print("PIRLeftPreBarrierActivated: ");
+  Serial.println(PIRLeftPreBarrierActivated);
+  Serial.print("PIRRightPreBarrierPrimed: ");
+  Serial.println(PIRRightPreBarrierPrimed);
+  Serial.print("PIRRightPreBarrierActivated: ");
+  Serial.println(PIRRightPreBarrierActivated);
+  Serial.print("PIRLeftStartBoxPrimed: ");
+  Serial.println(PIRLeftStartBoxPrimed);
+  Serial.print("PIRLeftStartBoxActivated: ");
+  Serial.println(PIRLeftStartBoxActivated);
+  Serial.print("PIRRightStartBoxPrimed: ");
+  Serial.println(PIRRightStartBoxPrimed);
+  Serial.print("PIRRightStartBoxActivated: ");
+  Serial.println(PIRRightStartBoxActivated);
 }
 
 void CTM_base::resetFlags() {
