@@ -1,4 +1,5 @@
 import tkinter as tk
+import os
 import serial
 from serial.tools import list_ports
 import csv
@@ -177,6 +178,7 @@ def data_collection_ready():
     file.close()
     ser.close()
     window.destroy()
+    os._exit(00)
 
 def sendParams():    
     hr_pump_time = entry_time1.get()
