@@ -367,7 +367,7 @@ void CTM_base::ActivatePIRRightStartBox() {
     
     PIRRightStartBoxPrimed = false;
     PIRRightStartBoxActivated = true;
-    
+
     PIRRSBCloseD5(); // Close D5 function
   }
 }
@@ -382,6 +382,45 @@ void CTM_base::checkSensors() {
   ActivatePIRRightPreBarrier();
   ActivatePIRLeftStartBox();
   ActivatePIRRightStartBox();
+}
+
+void CTM_base::printFlags() {
+  Serial.print("PIRStartPrimed: ");
+  Serial.println(PIRStartPrimed);
+  Serial.print("PIRStartActivated: ");
+  Serial.println(PIRStartActivated);
+  Serial.print("PIRMidstemPrimed: ");
+  Serial.println(PIRMidstemPrimed);
+  Serial.print("PIRMidstemActivated: ");
+  Serial.println(PIRMidstemActivated);
+  Serial.print("PIREndstemPrimed: ");
+  Serial.println(PIREndstemPrimed);
+  Serial.print("PIREndstemActivated: ");
+  Serial.println(PIREndstemActivated);
+  Serial.print("PIRLeftPostVertexPrimed: ");
+  Serial.println(PIRLeftPostVertexPrimed);
+  Serial.print("PIRLeftPostVertexActivated: ");
+  Serial.println(PIRLeftPostVertexActivated);
+  Serial.print("PIRRightPostVertexPrimed: ");
+  Serial.println(PIRRightPostVertexPrimed);
+  Serial.print("PIRRightPostVertexActivated: ");
+  Serial.println(PIRRightPostVertexActivated);
+  Serial.print("PIRLeftPreBarrierPrimed: ");
+  Serial.println(PIRLeftPreBarrierPrimed);
+  Serial.print("PIRLeftPreBarrierActivated: ");
+  Serial.println(PIRLeftPreBarrierActivated);
+  Serial.print("PIRRightPreBarrierPrimed: ");
+  Serial.println(PIRRightPreBarrierPrimed);
+  Serial.print("PIRRightPreBarrierActivated: ");
+  Serial.println(PIRRightPreBarrierActivated);
+  Serial.print("PIRLeftStartBoxPrimed: ");
+  Serial.println(PIRLeftStartBoxPrimed);
+  Serial.print("PIRLeftStartBoxActivated: ");
+  Serial.println(PIRLeftStartBoxActivated);
+  Serial.print("PIRRightStartBoxPrimed: ");
+  Serial.println(PIRRightStartBoxPrimed);
+  Serial.print("PIRRightStartBoxActivated: ");
+  Serial.println(PIRRightStartBoxActivated);
 }
 
 void CTM_base::resetFlags() {
@@ -635,8 +674,6 @@ void CTM_base::PIRRSBCloseD5() {
   resetFlags();
 }
 
-
-
 void CTM_base::buttonD1Pressed(){
   Serial.print("START DOOR BUTTON PRESSED");
 
@@ -757,34 +794,6 @@ void CTM_base::buttonD5Pressed(){
   }
 
 }
-
-
-
-  // // Right barrier
-  // _converted_bRH = 143 * _bRH + 10.2; // Relationship between time to raise and height for the right side
-  // if (_converted_bRH < 0){
-  //   _converted_bRH = 0;
-  //   }
-  // if(_converted_bRH > 2296){ // Max height that right barrier could go (16 cm)
-  //   _converted_bRH = 2296;
-  // }
-
-  // if(_converted_bRH != 0){
-  //   digitalWrite(barrierR, LOW);
-  //   analogWrite(barrierRpwm, 255);
-  //   delay(_converted_bRH); 
-  //   analogWrite(barrierRpwm, 0);
-  // }
-
-
-  // // Left Barrier
-  // _converted_bLH = 122 * _bLH - 7.78; // Relationship between time to raise and height for the left side
-  // if (_converted_bLH < 0){
-  //   _converted_bLH = 0;
-  // }
-  // if(_converted_bLH > 1943){  // Max height that left barrier could go (16 cm)
-  //   _converted_bLH = 1943;
-  // }
 
 void CTM_base::buttonRBarrierPressed(){
   unsigned long beginTime = millis();
@@ -911,16 +920,6 @@ void CTM_base::buttonLPumpPressed(){
   Serial.print("END PUMPING LEFT SIDE\n");
 
 }
-
-
-
-
-
-
-
-
-
-
 
 
 void CTM_base::checkButtons() {

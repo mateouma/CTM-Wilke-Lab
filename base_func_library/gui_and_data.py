@@ -84,15 +84,22 @@ def begin_recording():
         time.sleep(2)
         desktop = pywinauto.Desktop(backend="uia")
         cam = desktop['Camera']
-        # make sure in video mode
-        if cam.child_window(title="Switch to video mode", auto_id="CaptureButton_1", control_type="Button").exists():
-            cam.child_window(title="Switch to video mode", auto_id="CaptureButton_1", control_type="Button").click()
-        time.sleep(1)
-        # start then stop video
-        if cam.child_window(title="Take video", auto_id="CaptureButton_1", control_type="Button").exists():
-            cam.child_window(title="Take video", auto_id="CaptureButton_1", control_type="Button").click()
-            print("Started Recording!")
-        else:
+
+        successfulRecording = False
+        for i in range(5):
+            # make sure in video mode
+            if cam.child_window(title="Switch to video mode", auto_id="CaptureButton_1", control_type="Button").exists():
+                cam.child_window(title="Switch to video mode", auto_id="CaptureButton_1", control_type="Button").click()
+                time.sleep(1)
+            # start then stop video
+            if cam.child_window(title="Take video", auto_id="CaptureButton_1", control_type="Button").exists():
+                cam.child_window(title="Take video", auto_id="CaptureButton_1", control_type="Button").click()
+                successfulRecording = True
+                print("Started Recording!")
+            else:
+                time.sleep(5)
+        
+        if not successfulRecording:
             print("\n\n\nFAILED TO START RECORDING, PLEASE RECORD MANUALLY!!!\n\n\n")
 
 def end_recording():
