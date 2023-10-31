@@ -13,8 +13,8 @@ class CTM_base {
     CTM_base();
     void configureParams(int HRTime, int LRTime,
                          int barrierRHeight, int barrierLHeight,
-                         float prob, int HRside,
-                         int ITI, int delayTime,
+                         float prob_HR, float prob_LR,
+                         int HRside, int ITI, int delayTime,
                          int nForcetrials, int ftSide);
     void begin();
 
@@ -38,7 +38,7 @@ class CTM_base {
     void resetFlags();
 
     // pump function
-    void activatePump(int rew, int pump, float prob);
+    void activatePump(int rew, int pump, float prob_HR, float prob_LR);
 
     // sensor - door activation
     void PIRStartOpenD1D2D3();
@@ -70,6 +70,7 @@ class CTM_base {
     void playWithBarriers();
     void testPump();
     void testSensors();
+    void printFlags();
 
     // Trial Counter
     int currTrial = 0;
@@ -182,7 +183,8 @@ class CTM_base {
     int _rightReward;
     
     // choosing higher probability
-    float _prob;
+    float _prob_HR;
+    float _prob_LR;
 
     // inter-trial interval
     int _ITI;

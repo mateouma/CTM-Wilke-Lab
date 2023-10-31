@@ -58,19 +58,20 @@ void loop() {
       int lr_pump_time = atoi(strings[1]);
       int l_bar_height = atoi(strings[2]);
       int r_bar_height = atoi(strings[3]);
-      float prob = atof(strings[4]);
-      int hr_side = atoi(strings[5]);
+      float prob_HR = atof(strings[4]);
+      float prob_LR = atof(strings[5]);
+      int hr_side = atoi(strings[6]);
       /*if (strings[5] == "R")
         hr_side = 1;
       else if (strings[5] == "L")
         hr_side = 0;*/
       //Serial.print(strings[5]);
-      int ITI = atoi(strings[6]);
-      int delayTime = atoi(strings[7]);
+      int ITI = atoi(strings[7]);
+      int delayTime = atoi(strings[8]);
       int nForceTrials = 0;
       int ftSide = 1;
 
-      mazeProtocol.configureParams(hr_pump_time, lr_pump_time, r_bar_height, l_bar_height, prob, hr_side, ITI, delayTime, nForceTrials, ftSide);
+      mazeProtocol.configureParams(hr_pump_time, lr_pump_time, r_bar_height, l_bar_height, prob_HR, prob_LR, hr_side, ITI, delayTime, nForceTrials, ftSide);
       mazeProtocol.begin();
       mazeProtocol.printConfigParams();
 //      lcd.clear();
