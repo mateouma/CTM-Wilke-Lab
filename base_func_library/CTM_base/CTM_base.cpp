@@ -232,7 +232,7 @@ void CTM_base::startTimer() {
 void CTM_base::ActivatePIRStart() {
   if (digitalRead(PIR_Start) && PIRStartPrimed && !PIRStartActivated) { // Check for activated sensor AND that trial is available AND PIR is not already activated
     currentTime = millis();
-
+    currTrial++;
     if (!ftActive) {
       Serial.print("Current Trial: ");
       Serial.print(currTrial);
@@ -453,7 +453,7 @@ void CTM_base::resetFlags() {
   } else {
     Serial.print("Trial Completed: ");
     Serial.println(currTrial);
-    currTrial++;
+    // currTrial++;
   }
 
   if (ftActive) {
@@ -595,6 +595,7 @@ void CTM_base::PIRStartOpenD1D2D3() {
   
   delay(100);
   PIRMidstemPrimed = true; // Prime Midstem sensor
+  // currTrial++;
 }
 
 void CTM_base::PIRMidstemCloseD1() {

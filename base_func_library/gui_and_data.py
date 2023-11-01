@@ -176,7 +176,7 @@ def data_collection_ready():
         if currentTrial[0] == "Trial Completed" and int(currentTrial[1]) == samples:
             break
 
-
+    ser.write("Data Complete".encode('utf-8'))
     print("\n\n\nData collection complete!")
     print("This mouse picked the HR side in", "{:.2%}".format(hr_choice/samples), "of the trials.\n\n\n")
     time.sleep(2)
