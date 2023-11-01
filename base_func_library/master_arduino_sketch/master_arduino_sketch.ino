@@ -1,8 +1,5 @@
-// include the library code:
+// LCD Setup:
 #include <LiquidCrystal.h>
-
-// initialize the library by associating any needed LCD interface pin
-// with the arduino pin number it is connected to
 const int rs = 12, en = 11, d4 = 47, d5 = 45, d6 = 43, d7 = 49;
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 
@@ -17,6 +14,8 @@ char *strings[8];
 char *ptr = NULL;
 
 bool setupComplete = false;
+bool trialsComplete = false;
+bool shutdownComplete = false;
 int count = 0;
 void setup() {
   Serial.begin(9600);
@@ -24,18 +23,12 @@ void setup() {
   pinMode(5, OUTPUT);
   digitalWrite(2, LOW);
   digitalWrite(5, LOW);
-  // Trial_Count = 1;
 
-  // set up the LCD's number of columns and rows:
+// set up the LCD's number of columns and rows:
   lcd.begin(16, 2);
-//  lcd.print("Current Trial:");
-//   lcd.print("Hello World");
   lcd.print(" Welcome to the");
   lcd.setCursor(0, 1);
   lcd.print("Automated T-Maze");
-
-
-  
 }
 
 void loop() {
@@ -74,62 +67,51 @@ void loop() {
       mazeProtocol.configureParams(hr_pump_time, lr_pump_time, r_bar_height, l_bar_height, prob_HR, prob_LR, hr_side, ITI, delayTime, nForceTrials, ftSide);
       mazeProtocol.begin();
       mazeProtocol.printConfigParams();
-//      lcd.clear();
+
+//    Prepare LCD Display:
       lcd.setCursor(0, 0);
       lcd.print("Current Trial:  ");
       lcd.setCursor(0, 1);
-//      lcd.setCursor(0, 0);
-//      lcd.print("                ");
-//      lcd.setCursor(0, 1);
-//      lcd.print("                ");
+      lcd.print("                ");
+      lcd.setCursor(0, 1);
+
       setupComplete = true;
       delay(2000);
       if (nForceTrials > 0) {
         mazeProtocol.enactForceTrials();
       }
     }
-  } else if (setupComplete){
-
-      
-//      lcd.setCursor(0, 1);
-//      lcd.print(mazeProtocol.currTrial);
-//      Serial.println(mazeProtocol.currTrial);
+  } else if (setupComplete && !trialsComplete){
       mazeProtocol.checkSensors();
       mazeProtocol.checkButtons();
       count++;
 
+//    Space out write to the screen by 10,000 iterations:
       if(count > 10000){
-//        lcd.clear();
-//          lcd.setCursor(0, 1);
-//         lcd.print("Hello");
-        // lcd.setCursor(0, 1);
-        // print the number of seconds since reset:
-        // lcd.print(millis() / 1000);
-//        lcd.setCursor(0, 0);
-//        lcd.print("                ");
-//        lcd.setCursor(0, 1);
-//        lcd.print("                ");
-//        lcd.clear();
-//        lcd.setCursor(0, 0);        
-//        lcd.print("Current Trial:");
         lcd.setCursor(0, 1);
         lcd.print(String(mazeProtocol.currTrial));
-//        Serial.println("Current Trial:");
-//        Serial.println(mazeProtocol.currTrial);
-        
+
+
+//      Check to see if the maze has been informed that the trials are completed, and if so, set a flag:
+        if (Serial.available() > 0) {
+          trialsComplete = true;
+        }
+         
         count = 0;
       }
-
-//      if(last_displayed_trial != mazeProtocol.currTrial){
-//        lcd.clear();
-//        lcd.setCursor(0, 0);        
-//        lcd.print("Current Trial:");
-//        lcd.setCursor(0, 1);
-//        lcd.print(mazeProtocol.currTrial);
-//        last_displayed_trial = mazeProtocol.currTrial;
-//      }
-
      
+  }else if(trialsComplete && !shutdownComplete){
+//    Print the final code, we can add additional information here that is relevant. This will only execute once.
+      lcd.setCursor(0, 0);
+      lcd.print("                ");
+      lcd.setCursor(0, 1);
+      lcd.print("                ");
+      lcd.setCursor(0, 0);
+      lcd.print("Testing Complete");
+      lcd.setCursor(0, 1);
+      lcd.print(" Reset Maze Now");
+
+      shutdownComplete = true;
   }
 }
 
