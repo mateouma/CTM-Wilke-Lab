@@ -92,7 +92,7 @@ void loop() {
         lcd.print(String(mazeProtocol.currTrial));
 
 
-//      Check to see if the maze has been informed that the trials are completed, and if so, set a flag:
+//      Check to see if the maze has been informed that the trials are complted, and if so, set a flag:
         if (Serial.available() > 0) {
           trialsComplete = true;
         }
@@ -101,7 +101,7 @@ void loop() {
       }
      
   }else if(trialsComplete && !shutdownComplete){
-//    Print the final code, we can add additional information here that is relevant. This will only execute once.
+//    Print the final code, we can add additional information here that is relavent. This will only execute once.
       lcd.setCursor(0, 0);
       lcd.print("                ");
       lcd.setCursor(0, 1);
@@ -114,31 +114,3 @@ void loop() {
       shutdownComplete = true;
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//void setup() {
-//  // set up the LCD's number of columns and rows:
-//  lcd.begin(16, 2);
-//  // Print a message to the LCD.
-//  lcd.print("hello, world!");
-//}
-//
-//void loop() {
-//  // set the cursor to column 0, line 1
-//  // (note: line 1 is the second row, since counting begins with 0):
-//  lcd.setCursor(0, 1);
-//  // print the number of seconds since reset:
-//  lcd.print(millis() / 1000);
-//}
