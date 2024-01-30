@@ -118,6 +118,9 @@ class CTM_base {
     // edit these variables if the pins change
     // =============================
     
+    // Pressure Sensor
+    #define FORCE_SENSOR_PIN A0 // the FSR and 10K pulldown are connected to A0
+
     // door outputs
     int outputD1 = 32;
     int outputD2 = 33;

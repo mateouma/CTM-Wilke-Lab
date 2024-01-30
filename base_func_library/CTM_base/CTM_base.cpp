@@ -230,7 +230,17 @@ void CTM_base::startTimer() {
 }
 
 void CTM_base::ActivatePIRStart() {
-  if (digitalRead(PIR_Start) && PIRStartPrimed && !PIRStartActivated) { // Check for activated sensor AND that trial is available AND PIR is not already activated
+
+  int analogReading = analogRead(FORCE_SENSOR_PIN);
+  // Serial.print("Force sensor reading = ");
+  // Serial.print(analogReading); // print the raw analog reading
+
+  if (((analogReading > 10) && digitalRead(PIR_Start)) && PIRStartPrimed && !PIRStartActivated) { // Check for activated sensor AND that trial is available AND PIR is not already activated
+  // if (digitalRead(PIR_Start) && PIRStartPrimed && !PIRStartActivated) { // Check for activated sensor AND that trial is available AND PIR is not already activated
+    Serial.print("Force Sensor Value:");
+    Serial.print(analogReading);
+    Serial.print("\n");
+
     currentTime = millis();
     currTrial++;
     if (!ftActive) {
@@ -242,7 +252,11 @@ void CTM_base::ActivatePIRStart() {
       Serial.print(currFt);
       Serial.print("\n");
     }
-    
+
+    Serial.print("Pressure Amount: ");
+    Serial.print(analogReading);
+    Serial.print("\n");
+
     Serial.print("PIR Start Activation Time: ");
     Serial.print(currentTime);
     Serial.print("\n");
