@@ -297,6 +297,26 @@ void CTM_base::ActivatePIREndstem() {
     PIRLeftPostVertexPrimed = true; // Prime post LPV sensor
     PIRRightPostVertexPrimed = true; // Prime post-RPV sensor
   }
+  // If the endstem PIR is triggered but the midstem PIR has not been triggered yet, allow the trial to continue:
+  else if (digitalRead(PIR_Endstem) && !PIRMidstemActivated && !PIREndstemActivated){
+    currentTime = millis();
+    Serial.print("PIR Midstem Activation Time: ");
+    Serial.print("NaN");
+    Serial.print("\n");
+    
+    PIRMidstemPrimed = false; // Un-prime PIRMidstem
+    PIRMidstemActivated = true; 
+    
+    Serial.print("PIR Endstem Activation Time: ");
+    Serial.print(currentTime);
+    Serial.print("\n");
+    
+    PIREndstemPrimed = false;
+    PIREndstemActivated = true;
+  
+    PIRLeftPostVertexPrimed = true; // Prime post LPV sensor
+    PIRRightPostVertexPrimed = true; // Prime post-RPV sensor
+  }
 }
 
 void CTM_base::ActivatePIRLeftPostVertex() {
@@ -396,6 +416,36 @@ void CTM_base::checkSensors() {
   ActivatePIRRightPreBarrier();
   ActivatePIRLeftStartBox();
   ActivatePIRRightStartBox();
+
+  // currentTime = millis();
+  // if(digitalRead(PIR_Start)){
+  //   Serial.print("PIR Start Activation Time: ");
+  //   Serial.print(currentTime);
+  //   Serial.print("\n");
+  // }
+  // if(digitalRead(PIR_Midstem)){
+  //   Serial.print("PIR Midstem Activation Time: ");
+  //   Serial.print(currentTime);
+  //   Serial.print("\n");
+  // }
+  // if(PIR_LeftStartBox){
+  //   Serial.print("PIR LSB Activation Time: ");
+  //   Serial.print(currentTime);
+  //   Serial.print("\n");
+  // }
+  // if(PIR_RightStartBox){
+  //   Serial.print("PIR RSB Activation Time: ");
+  //   Serial.print(currentTime);
+  //   Serial.print("\n");
+  // }
+  // if(PIR_RightStartBox){
+  //   Serial.print("PIR RSB Activation Time: ");
+  //   Serial.print(currentTime);
+  //   Serial.print("\n");
+  // }
+  
+
+
 }
 
 void CTM_base::printFlags() {
