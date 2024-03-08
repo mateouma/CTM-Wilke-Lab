@@ -297,8 +297,8 @@ void CTM_base::ActivatePIREndstem() {
     PIRLeftPostVertexPrimed = true; // Prime post LPV sensor
     PIRRightPostVertexPrimed = true; // Prime post-RPV sensor
   }
-  // If the endstem PIR is triggered but the midstem PIR has not been triggered yet, allow the trial to continue:
-  else if (digitalRead(PIR_Endstem) && !PIRMidstemActivated && !PIREndstemActivated){
+  // If the endstem PIR is triggered and the Start is triggered but the midstem PIR has not been triggered yet, allow the trial to continue:
+  else if (digitalRead(PIR_Endstem) && !PIRMidstemActivated && !PIREndstemActivated && PIRStartActivated){
     currentTime = millis();
     Serial.print("PIR Midstem Activation Time: ");
     Serial.print("NaN");
