@@ -71,6 +71,7 @@ class CTM_base {
     void testPump();
     void testSensors();
     void printFlags();
+    void calibrateBarriers();
 
     // Trial Counter
     int currTrial = 0;

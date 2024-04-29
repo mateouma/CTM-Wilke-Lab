@@ -110,6 +110,10 @@ void CTM_base::begin() {
 
   Serial.print("Setup complete\n");
   startTimer();
+
+  /*Begin barrier calibration code*/
+  // calibrateBarriers();
+  /*End barrier calibration code*/
 }
 
 void CTM_base::printConfigParams() {
@@ -1124,5 +1128,42 @@ void CTM_base::enactForceTrials() {
   } else {
     digitalWrite(outputD3, LOW); // close D3
     isD3Open = false;
+  }
+}
+
+
+
+void CTM_base::calibrateBarriers(){
+  resetBarriers();
+  // Test right barrier first:
+  Serial.println("Right side Barrier calibration: ");
+  for(int i = 0; i < 2800; i += 100){
+    Serial.print("Testing time: ");
+    Serial.println(i);
+    delay(100);
+
+    digitalWrite(barrierR, LOW);
+    analogWrite(barrierRpwm, 255);
+    delay(i); 
+    analogWrite(barrierRpwm, 0);
+    delay(5000);
+    resetBarriers();
+  }
+
+  delay(5000);
+
+  // Test left barrier next:
+  Serial.println("Left side Barrier calibration: ");
+  for(int i = 0; i < 2800; i += 100){
+    Serial.print("Testing time: ");
+    Serial.println(i);
+    delay(100);
+
+    digitalWrite(barrierL, LOW);
+    analogWrite(barrierLpwm, 255);
+    delay(i); 
+    analogWrite(barrierLpwm, 0);
+    delay(5000);
+    resetBarriers();
   }
 }
