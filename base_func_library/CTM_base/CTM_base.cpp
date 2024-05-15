@@ -169,12 +169,12 @@ void CTM_base::resetBarriers() {
 
 void CTM_base::configureBarriers() {
   // Right barrier
-  _converted_bRH = 143 * _bRH + 10.2; // Relationship between time to raise and height for the right side
+  _converted_bRH = 163 * _bRH + 22.7; // Relationship between time to raise and height for the right side
   if (_converted_bRH < 0){
     _converted_bRH = 0;
     }
-  if(_converted_bRH > 2296){ // Max height that right barrier could go (16 cm)
-    _converted_bRH = 2296;
+  if(_converted_bRH > MAX_RIGHT_BARRIER_HEIGHT){ // Max height that right barrier could go (16 cm)
+    _converted_bRH = MAX_RIGHT_BARRIER_HEIGHT;
   }
 
   if(_converted_bRH != 0){
@@ -186,12 +186,12 @@ void CTM_base::configureBarriers() {
 
 
   // Left Barrier
-  _converted_bLH = 122 * _bLH - 7.78; // Relationship between time to raise and height for the left side
+  _converted_bLH = 133 * _bLH + 42.8; // Relationship between time to raise and height for the left side
   if (_converted_bLH < 0){
     _converted_bLH = 0;
   }
-  if(_converted_bLH > 1943){  // Max height that left barrier could go (16 cm)
-    _converted_bLH = 1943;
+  if(_converted_bLH > MAX_LEFT_BARRIER_HEIGHT){  // Max height that left barrier could go (16 cm)
+    _converted_bLH = MAX_LEFT_BARRIER_HEIGHT;
   }
 
   if(_converted_bLH != 0){
@@ -877,13 +877,13 @@ void CTM_base::buttonRBarrierPressed(){
     analogWrite(barrierRpwm, 0);
     timeRan = millis() - beginTime;
 
-    if(_converted_bRH + timeRan > 2296){
-      _converted_bRH = 2296;
+    if(_converted_bRH + timeRan > MAX_RIGHT_BARRIER_HEIGHT){
+      _converted_bRH = MAX_RIGHT_BARRIER_HEIGHT;
     }else{
       _converted_bRH = _converted_bRH + timeRan;
     }
   }
-  else if(_converted_bRH >= 2296){
+  else if(_converted_bRH >= MAX_RIGHT_BARRIER_HEIGHT){
     Serial.print("LOWERING RIGHT BARRIER\n");
     digitalWrite(barrierR, HIGH);
     analogWrite(barrierRpwm, 255);
@@ -895,7 +895,7 @@ void CTM_base::buttonRBarrierPressed(){
     if(2296 - timeRan < 0){
       _converted_bRH = 0;
     }else{
-      _converted_bRH = 2296 - timeRan;
+      _converted_bRH = MAX_RIGHT_BARRIER_HEIGHT - timeRan;
     }
   }
   // float approxHeight = (_converted_bRH - 10.2) / 143;
@@ -916,7 +916,7 @@ void CTM_base::buttonLBarrierPressed(){
   unsigned long beginTime = millis();
   unsigned long timeRan = 0;
 
-  if(_converted_bLH < 1943){
+  if(_converted_bLH < MAX_LEFT_BARRIER_HEIGHT){
     Serial.print("RAISING LEFT BARRIER\n");
     digitalWrite(barrierL, LOW);
     analogWrite(barrierLpwm, 255);
@@ -925,13 +925,13 @@ void CTM_base::buttonLBarrierPressed(){
     analogWrite(barrierLpwm, 0);
     timeRan = millis() - beginTime;
 
-    if(_converted_bLH + timeRan > 1943){
-      _converted_bLH = 1943;
+    if(_converted_bLH + timeRan > MAX_LEFT_BARRIER_HEIGHT){
+      _converted_bLH = MAX_LEFT_BARRIER_HEIGHT;
     }else{
       _converted_bLH = _converted_bLH + timeRan;
     }
   }
-  else if(_converted_bLH >= 1943){
+  else if(_converted_bLH >= MAX_LEFT_BARRIER_HEIGHT){
     Serial.print("LOWERING LEFT BARRIER\n");
     digitalWrite(barrierL, HIGH);
     analogWrite(barrierLpwm, 255);
@@ -943,7 +943,7 @@ void CTM_base::buttonLBarrierPressed(){
     if(1943 - timeRan < 0){
       _converted_bLH = 0;
     }else{
-      _converted_bLH = 1943 - timeRan;
+      _converted_bLH = MAX_LEFT_BARRIER_HEIGHT - timeRan;
     }
   }
 

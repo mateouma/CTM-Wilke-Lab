@@ -180,6 +180,9 @@ class CTM_base {
     int _bLH;
     int _converted_bRH;
     int _converted_bLH;
+    #define MAX_RIGHT_BARRIER_HEIGHT 2630
+    #define MAX_LEFT_BARRIER_HEIGHT 2170
+
     
     // choosing which side is the HR
     int _HRside;
