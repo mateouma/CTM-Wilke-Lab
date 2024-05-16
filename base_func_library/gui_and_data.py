@@ -9,6 +9,7 @@ from sys import platform
 import subprocess
 if platform == "win32":
     import pywinauto
+import random
 
 # # This doesn't work ... need to fix.
 
@@ -39,6 +40,18 @@ if platform == "win32":
 # original_sigint = signal.getsignal(signal.SIGINT)
 # signal.signal(signal.SIGINT, signal_handler)
 
+onSensor = ""
+offSensor = ""
+onTimeDelay = 0
+offTimeDelay = 0
+laserSide = "Both HR and LR Sides" # Both sides turn on
+laserProb = 0
+laserPulseType = 0 #0 is constant and 1 is pulse
+laserMode = "" #If it is manual or sensor event
+
+file_name = ""
+total_samples = 0
+
 
 # Serial connection
 # Declare serial port variables
@@ -51,28 +64,28 @@ ser = serial.Serial()
 portsList = []
 for onePort in ports:
     portsList.append(str(onePort))
-    print(str(onePort))
+    # print(str(onePort))
 
 # User-inputted port (ADD TO GUI)    
 val = 3
 for _, j in enumerate(portsList):
     if j.startswith("COM" + str(val)):
         portVar = "COM" + str(val)
-        print(portVar)
+        # print(portVar)
 
-if platform == "win32":
-    # Windows Port Search:
-    portVar = "COM" + str(input("Port: COM"))
-elif platform == "darwin":
-    # MacOS Port Search:
-    portVar = "/dev/cu.usbmodem" + str(input("Port: /dev/cu.usbmodem"))
-else:
-    print("Unsupported operating system")
-    quit()
+# if platform == "win32":
+#     # Windows Port Search:
+#     portVar = "COM" + str(input("Port: COM"))
+# elif platform == "darwin":
+#     # MacOS Port Search:
+#     portVar = "/dev/cu.usbmodem" + str(input("Port: /dev/cu.usbmodem"))
+# else:
+#     print("Unsupported operating system")
+#     quit()
 
-ser.baudrate = 9600
-ser.port = portVar
-ser.open()
+# ser.baudrate = 9600
+# ser.port = portVar
+# ser.open()
 
 # =======================
 # Functions
@@ -119,12 +132,14 @@ def end_recording():
 
 
 def data_collection_ready():
+    global file_name, total_samples
     # Display data to terminal
     todayDateandTime = datetime.now()
     todayDateandTime = todayDateandTime.strftime("%m_%d_%Y-%H_%M_%S") 
-    file_name = entry_file_name.get() + "_" + todayDateandTime + ".csv"
-    if len(entry_file_name.get()) == 0:
+    if len(file_name) == 0:
         file_name = "test-" + todayDateandTime + ".csv" # Sets the file name to a default value incase it is not specified.    
+    else:
+        file_name = file_name + "_" + todayDateandTime + ".csv" 
     file = open(file_name, 'a')
     print("Created file with name", file_name)
     
@@ -143,7 +158,7 @@ def data_collection_ready():
     readings = data.split(",")
     print(readings)
     
-    samples = int(entry_Samples.get())  # How many samples to collect (Set by the GUI)
+    samples = total_samples  # How many samples to collect (Set by the GUI)
     sensor_data = []  # Store data
     
     lr_choice = 0
@@ -187,7 +202,155 @@ def data_collection_ready():
     window.destroy()
     os._exit(00)
 
-def sendParams():    
+def laser_OffSetUp(window):
+    def submit_laser_off_params(window):
+        global offSensor, offTimeDelay
+        offSensor = sensor_off_selected.get()
+        offTimeDelay = laser_off_time_delay_selected.get()
+        print(onSensor)
+        print(onTimeDelay)
+
+        window.destroy()
+        return
+
+    window.destroy()
+
+    window = tk.Tk()
+    window.title("Automate T-Maze Laser Set-Up")
+    tk.Label(window, text=f'Setting Up When the Laser Turns Off').grid(row=0, column=1, padx=10, pady=5)
+
+    # Labels:
+    tk.Label(window, text="Which Sensor Should Turn the Laser Off?").grid(row=1, column=0, padx=10, pady=5)
+    tk.Label(window, text="Time Delay Between Sensor Event and Laser Off (seconds):").grid(row=2, column=0, padx=10, pady=5)
+
+    if onSensor == "Start":
+        sensor_off_Options = ["Midstem", "Endstem", "Post Vertex", "Pre-Barrier", "Start Box"]
+    elif onSensor == "Midstem":
+        sensor_off_Options = ["Endstem", "Post Vertex", "Pre-Barrier", "Start Box"]
+    elif onSensor == "Endstem":
+        sensor_off_Options = ["Post Vertex", "Pre-Barrier", "Start Box"]
+    elif onSensor == "Post Vertex":
+        sensor_off_Options = ["Pre-Barrier", "Start Box"]
+    elif onSensor == "Pre-Barrier":
+        sensor_off_Options = ["Start Box"]
+
+    sensor_off_selected = tk.StringVar(window) 
+    sensor_off_selected.set(sensor_off_Options[0]) 
+    sensor_off_dropdown_menu = tk.OptionMenu(window, sensor_off_selected, *sensor_off_Options) 
+    sensor_off_dropdown_menu.grid(row=1, column=1, padx=10, pady=5)
+
+    laser_off_time_delay_selected = tk.Entry(window)
+    laser_off_time_delay_selected.grid(row=2, column=1, padx=10, pady=5)
+
+    button = tk.Button(window, text="Submit", command=lambda: submit_laser_off_params(window))
+    button.grid(row=3, column=1, padx=10, pady=5)
+
+    window.mainloop()
+
+def laser_OnSetUp(window):
+    def submit_laser_on_params(window):
+        global onSensor, onTimeDelay, laserSide
+        onSensor = sensor_on_selected.get()
+        onTimeDelay = laser_on_time_delay_selected.get()
+        laserSide = laser_trial_type_selected.get()
+        print(onSensor)
+        print(onTimeDelay)
+        print(laserSide)
+
+        laser_OffSetUp(window)
+
+    window.destroy()
+
+    window = tk.Tk()
+    window.title("Automate T-Maze Laser Set-Up")
+    tk.Label(window, text=f'Setting Up When the Laser Turns On').grid(row=0, column=1, padx=10, pady=5)
+
+    # Labels:
+    tk.Label(window, text="Which Sensor Should Turn the Laser On?").grid(row=1, column=0, padx=10, pady=5)
+    tk.Label(window, text="Time Delay Between Sensor Event and Laser On (seconds):").grid(row=2, column=0, padx=10, pady=5)
+    tk.Label(window, text="Which Type of Trial Should Turn the Laser On?").grid(row=3, column=0, padx=10, pady=5)
+
+    sensor_on_Options = ["Start", "Midstem", "Endstem", "Post Vertex", "Pre-Barrier"]
+    sensor_on_selected = tk.StringVar(window) 
+    sensor_on_selected.set("Start") 
+    sensor_on_dropdown_menu = tk.OptionMenu(window, sensor_on_selected, *sensor_on_Options) 
+    sensor_on_dropdown_menu.grid(row=1, column=1, padx=10, pady=5)
+
+    laser_on_time_delay_selected = tk.Entry(window)
+    laser_on_time_delay_selected.grid(row=2, column=1, padx=10, pady=5)
+    
+    laser_trial_type_Options = ["Both HR and LR Sides", "HR Side", "LR Side"]
+    laser_trial_type_selected = tk.StringVar(window) 
+    laser_trial_type_selected.set("Both HR and LR Sides") 
+    laser_trial_type_dropdown_menu = tk.OptionMenu(window, laser_trial_type_selected, *laser_trial_type_Options) 
+    laser_trial_type_dropdown_menu.grid(row=3, column=1, padx=10, pady=5)
+
+    button = tk.Button(window, text="Submit", command=lambda: submit_laser_on_params(window))
+    button.grid(row=4, column=1, padx=10, pady=5)
+
+    window.mainloop()
+
+
+def laserSetUp(window):
+    def input_laser_on_params(window):
+        global laserProb, laserPulseType, laserMode
+        laserMode = laser_mode_selected.get()
+        laserPulseType = laserPulse_selected.get()
+        laserProb = float(laserProb_selected.get())
+        print(laserMode)
+        print(laserPulseType)
+        print(laserProb)
+        print("made it")
+
+        if(laserMode == "Manual Mode"):
+            window.destroy()
+            return
+        elif(laserMode == "Turn on by a sensor event"):
+            laser_OnSetUp(window)
+        else:
+            print("Error with Laser Mode")
+            quit()
+    
+    window.destroy()
+
+    window = tk.Tk()
+    window.title("Automate T-Maze Laser Set-Up")
+    tk.Label(window, text=f'Setting Up When the Laser Turns On').grid(row=0, column=1, padx=10, pady=5)
+
+    # Labels:
+    tk.Label(window, text="When should the laser turn on?").grid(row=1, column=0, padx=10, pady=5)
+    tk.Label(window, text="What pulse type should the laser have?").grid(row=2, column=0, padx=10, pady=5)
+    tk.Label(window, text="What is the percentage of trials that should have the laser? (%)").grid(row=3, column=0, padx=10, pady=5)
+
+    laser_Mode_Options = ["Turn on by a sensor event", "Manual Mode"]
+    laser_mode_selected = tk.StringVar(window) 
+    laser_mode_selected.set("Turn on by a sensor event") 
+    laser_mode_dropdown_menu = tk.OptionMenu(window, laser_mode_selected, *laser_Mode_Options) 
+    laser_mode_dropdown_menu.grid(row=1, column=1, padx=10, pady=5)
+
+    # Create the option buttons
+    laserPulse_selected = tk.StringVar()
+    laserPulse_selected.set(0) # Set the high side to Const
+    def set_pulse_1():
+        laserPulse_selected.set(0) # Set the high side to Const
+
+    def set_pulse_2():
+        laserPulse_selected.set(1) # Set the Hight side to Pulse.\
+    laserPulse_button1 = tk.Radiobutton(window, text="Constant", variable=laserPulse_selected, value=0, command=set_pulse_1)
+    laserPulse_button1.grid(row=2, column=1, padx=10, pady=5)
+    laserPulse_button2 = tk.Radiobutton(window, text="Pulse", variable=laserPulse_selected, value=1, command=set_pulse_2)
+    laserPulse_button2.grid(row=2, column=2, padx=10, pady=5)
+    
+    laserProb_selected = tk.Entry(window)
+    laserProb_selected.grid(row=3, column=1, padx=10, pady=5)
+
+    button = tk.Button(window, text="Submit", command=lambda: input_laser_on_params(window))
+    button.grid(row=4, column=1, padx=10, pady=5)
+
+    window.mainloop()
+
+def sendParams(window):    
+    global file_name, total_samples
     hr_pump_time = entry_time1.get()
     lr_pump_time = entry_time2.get()
     l_bar_height = entry_height1.get()
@@ -197,8 +360,48 @@ def sendParams():
     hr_side = option_var.get()
     ITI = entry_ITI.get()
     delayTime = entry_delayTime.get()
-    protocol_param_string = f'{hr_pump_time},{lr_pump_time},{l_bar_height},{r_bar_height},{prob_HR},{prob_LR},{hr_side},{ITI},{delayTime}'
+    total_samples = entry_Samples.get()
+    file_name = entry_file_name.get()
+    laser_selected = entry_laser_selected.get()
+
+    if(len(hr_pump_time) == 0 or len(lr_pump_time) == 0 or len(l_bar_height) == 0 or len(r_bar_height) == 0 
+       or len(prob_HR) == 0 or len(prob_LR) == 0 or len(hr_side) == 0 or len(ITI) == 0 
+       or len(delayTime) == 0 or len(total_samples) == 0):
+        print("Please input a value for all parameters")
+        quit()
     
+    total_samples = int(total_samples)
+    #Take just the port value from the selected
+    selected_port = port_selected.get().split(' ')[0]
+    if selected_port == "Select": 
+        print("Please Select a Port")
+        quit()
+
+    print(laser_selected)
+    
+    # Finish the string input:
+    if laser_selected == "Yes":
+        laserSetUp(window)
+
+    #Need array of which trial will receive laser 
+    # laser_on_array=[]
+    print(laserProb)
+    num_laser_on = int(laserProb * total_samples)
+    num_laser_off = total_samples - num_laser_on 
+    laser_on_array = [1] * num_laser_on + [0] * num_laser_off
+    random.shuffle(laser_on_array)
+
+    print(laser_on_array)
+
+
+    
+    #Laser function will update global values:
+    protocol_param_string = f'{hr_pump_time},{lr_pump_time},{l_bar_height},{r_bar_height},{prob_HR},{prob_LR},{hr_side},{ITI},{delayTime},{laser_selected},{laserMode},{laserPulseType},{laserSide},{onSensor},{onTimeDelay},{offSensor},{offTimeDelay},{laser_on_array}'
+    
+    ser.baudrate = 9600
+    ser.port = selected_port
+    ser.open()
+        
     print(protocol_param_string)
     # Write protocol variables to Serial in form of a string
     ser.write(protocol_param_string.encode('utf-8'))
@@ -239,8 +442,10 @@ tk.Label(window, text="Door Close Time Delay (ms):").grid(row=8, column=0, padx=
 tk.Label(window, text="Number of Samples:").grid(row=9, column=0, padx=10, pady=5)
 tk.Label(window, text="File Name:").grid(row=10, column=0, padx=10, pady=5)
 tk.Label(window, text=".csv").grid(row=10, column=2, padx=10, pady=5)
+tk.Label(window, text="Would you like to use the laser?").grid(row=11, column=0, padx=10, pady=5)
+tk.Label(window, text="Select the connected port:").grid(row=12, column=0, padx=10, pady=5)
 result_label = tk.Label(window, text="")
-result_label.grid(row=11, column=0, padx=10, pady=5, columnspan=2)
+result_label.grid(row=13, column=0, padx=10, pady=5, columnspan=2)
 
 # Create the entry fields
 entry_time1 = tk.Entry(window)
@@ -264,7 +469,18 @@ entry_Samples.grid(row=9, column=1, padx=10, pady=5)
 entry_file_name = tk.Entry(window)
 entry_file_name.grid(row=10, column=1, padx=10, pady=5)
 
-# Create the option buttons
+entry_laser_selected = tk.StringVar(window) 
+entry_laser_selected.set("No") 
+optionList = ["No", "Yes"]
+dropdown_menu = tk.OptionMenu(window, entry_laser_selected, *optionList) 
+dropdown_menu.grid(row=11, column=1, padx=10, pady=5)
+
+port_selected = tk.StringVar(window) 
+port_selected.set("Select an Option") 
+dropdown_menu = tk.OptionMenu(window, port_selected, *portsList) 
+dropdown_menu.grid(row=12, column=1, padx=10, pady=5)
+
+# Create the option buttons for HR and LR
 option_var = tk.StringVar()
 option_var.set(1) # Set the high side to Right
 
@@ -280,10 +496,11 @@ option_button2 = tk.Radiobutton(window, text="Left", variable=option_var, value=
 option_button2.grid(row=6, column=1, padx=10, pady=5)
 
 # Create the button
-button = tk.Button(window, text="Run Arduino Script", command=lambda: sendParams())
-button.grid(row=11, column=1, padx=10, pady=5)
+button = tk.Button(window, text="Run Arduino Script", command=lambda: sendParams(window))
+button.grid(row=13, column=1, padx=10, pady=5)
 button2 = tk.Button(window, text="Run Testing Script", command=lambda: sendTestParams())
-button2.grid(row=12, column=1, padx=10, pady=5)
+button2.grid(row=14, column=1, padx=10, pady=5)
+
 #button2 = tk.Button(window, text="Close Window", command=window.destroy())
 #button2.grid(row=7, column=2, padx=10, pady=5)
 
