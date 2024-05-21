@@ -12,10 +12,15 @@ CTM_base::CTM_base() {
 }
 
 void CTM_base::configureParams(int HRTime, int LRTime,
-                         int barrierRHeight, int barrierLHeight,
-                         float prob_HR, float prob_LR,
-                         int HRside, int ITI, int delayTime,
-                         int nForceTrials, int ftSide) {
+                               int barrierRHeight, int barrierLHeight,
+                               float prob_HR, float prob_LR,
+                               int HRside, int ITI, int delayTime,
+                               int nForceTrials, int ftSide,
+                               int laserSelected, int laserMode,
+                               int laserPulseType, int laserSide,
+                               int onSensor, int onTimeDelay,
+                               int offSensor, int offTimeDelay,
+                               int laserOnArray[]) {
   // HIGH REWARD = 1
   // LOW REWARD = 0
 
@@ -30,6 +35,15 @@ void CTM_base::configureParams(int HRTime, int LRTime,
   _delayTime = delayTime;
   _nForceTrials = nForceTrials;
   _ftSide = ftSide;
+  _laserSelected = laserSelected;
+  _laserMode = laserMode;
+  _laserPulseType = laserPulseType;
+  _laserSide = laserSide; // HR is 1, LR is 0, both is 2
+  _laserOnCond = onSensor;
+  _laserOnTimeDelay = onTimeDelay;
+  _laserOffCond = offSensor;
+  _laserOffTimeDelay = offTimeDelay;
+  _laserTrials = laserOnArray;
 
   // HRside: R is 1, L is 0  
   if (HRside == 1) {
@@ -94,7 +108,7 @@ void CTM_base::begin() {
   pinMode(rightBarrierButton, INPUT_PULLUP);
   pinMode(leftBarrierButton, INPUT_PULLUP);
 
-  
+
   resetBarriers();
   configureBarriers();
 
@@ -102,6 +116,22 @@ void CTM_base::begin() {
   isD2Open = true;
   digitalWrite(outputD3, HIGH); // Open D3
   isD3Open = true;
+
+  if (_laserOnCond == 3 || _laserOnCond == 5) {
+    laserOnCondPin1 = sensorArray[_laserOnCond];
+    laserOnCondPin2 = sensorArray[_laserOnCond+1];
+  } else {
+    laserOnCondPin1 = sensorArray[_laserOnCond];
+    laserOnCondPin2 = sensorArray[_laserOnCond];
+  }
+
+  if (_laserOnCond == 3 || _laserOnCond == 5) {
+    laserOffCondPin1 = sensorArray[_laserOffCond];
+    laserOffCondPin2 = sensorArray[_laserOffCond+1];
+  } else {
+    laserOffCondPin1 = sensorArray[_laserOffCond];
+    laserOffCondPin2 = sensorArray[_laserOffCond];
+  }
 
   delay(500);
 
@@ -510,6 +540,7 @@ void CTM_base::resetFlags() {
   PIRLeftStartBoxActivated = false;
   PIRRightStartBoxPrimed = false;
   PIRRightStartBoxActivated = false;
+  laserPrimed = true;
 
   Serial.println("Flags Reset");
 
@@ -741,6 +772,30 @@ void CTM_base::PIRRSBCloseD5() {
 
   delay(_ITI);
   resetFlags();
+}
+
+void CTM_base::checkLaser() {
+  // to-do: digital write const or pulse to pin
+  if (_laserMode == 1) {
+    if (laserTrials[currTrial-1]) {
+      if ((digitalRead(laserOnCondPin1) || digitalRead(laserOnCondPin2))&& laserPrimed && !laserActive) {
+        currentTime = millis();
+        Serial.print("Laser ON Time: ");
+        Serial.print(currentTime);
+        Serial.print("\n");
+        laserActive = true;
+        laserPrimed = false;
+      }
+
+      if ((digitalRead(laserOnCondPin1) || digitalRead(laserOffCondPin2)) && laserActive) {
+        currentTime = millis();
+        Serial.print("Laser OFF Time: ");
+        Serial.print(currentTime);
+        Serial.print("\n");
+        laserActive = false;
+      }
+    }
+  }
 }
 
 void CTM_base::buttonD1Pressed(){
@@ -990,7 +1045,6 @@ void CTM_base::buttonLPumpPressed(){
 
 }
 
-
 void CTM_base::checkButtons() {
   startDoorButtonState = digitalRead(startDoorButton);
   backRightDoorButtonState = digitalRead(backRightDoorButton);
@@ -1130,8 +1184,6 @@ void CTM_base::enactForceTrials() {
     isD3Open = false;
   }
 }
-
-
 
 void CTM_base::calibrateBarriers(){
   resetBarriers();

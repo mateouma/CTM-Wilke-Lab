@@ -61,10 +61,30 @@ void loop() {
       //Serial.print(strings[5]);
       int ITI = atoi(strings[7]);
       int delayTime = atoi(strings[8]);
+      int laserSelected = atoi(strings[9]);
+      int laserMode = atoi(strings[10]);
+      int laserPulseType = atoi(strings[11]);
+      int laserSide = atoi(strings[12]);
+      int onSensor = atoi(strings[13]);
+      int onTimeDelay = atoi(strings[14]);
+      int offSensor = atoi(strings[15]);
+      int offTimeDelay = atoi(strings[16]);
+      int laserOnArray[] = atoi(strings[17]);
       int nForceTrials = 0;
       int ftSide = 1;
 
-      mazeProtocol.configureParams(hr_pump_time, lr_pump_time, r_bar_height, l_bar_height, prob_HR, prob_LR, hr_side, ITI, delayTime, nForceTrials, ftSide);
+      mazeProtocol.configureParams(hr_pump_time, lr_pump_time,
+                                   r_bar_height, l_bar_height, 
+                                   prob_HR, prob_LR, 
+                                   hr_side, 
+                                   ITI, 
+                                   delayTime, 
+                                   nForceTrials, ftSide,
+                                   laserSelected, laserMode,
+                                   laserPulseType, laserSide,
+                                   onSensor, onTimeDelay,
+                                   offSensor, offTimeDelay,
+                                   laserOnArray);
       mazeProtocol.begin();
       mazeProtocol.printConfigParams();
 
@@ -84,6 +104,7 @@ void loop() {
   } else if (setupComplete && !trialsComplete){
       mazeProtocol.checkSensors();
       mazeProtocol.checkButtons();
+      mazeProtocol.checkLaser();
       count++;
 
 //    Space out write to the screen by 10,000 iterations:

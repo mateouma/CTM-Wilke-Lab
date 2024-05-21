@@ -52,6 +52,14 @@ laserMode = "" #If it is manual or sensor event
 file_name = ""
 total_samples = 0
 
+sensorArray = {
+    "Start":0,
+    "Midstem":1,
+    "Endstem":2,
+    "Post Vertex": 3,
+    "Pre-Barrier": 5,
+    "Start Box": 7
+}
 
 # Serial connection
 # Declare serial port variables
@@ -257,6 +265,13 @@ def laser_OnSetUp(window):
         print(onTimeDelay)
         print(laserSide)
 
+        if laserSide == "Both HR and LR Sides":
+            laserSide = 0
+        elif laserSide == "HR Side":
+            laserSide = 1
+        elif laserSide == "LR Side":
+            laserSide = -1
+
         laser_OffSetUp(window)
 
     window.destroy()
@@ -304,9 +319,11 @@ def laserSetUp(window):
 
         if(laserMode == "Manual Mode"):
             window.destroy()
+            laserMode = 0
             return
         elif(laserMode == "Turn on by a sensor event"):
             laser_OnSetUp(window)
+            laserMode = 1
         else:
             print("Error with Laser Mode")
             quit()
@@ -320,7 +337,7 @@ def laserSetUp(window):
     # Labels:
     tk.Label(window, text="When should the laser turn on?").grid(row=1, column=0, padx=10, pady=5)
     tk.Label(window, text="What pulse type should the laser have?").grid(row=2, column=0, padx=10, pady=5)
-    tk.Label(window, text="What is the percentage of trials that should have the laser? (%)").grid(row=3, column=0, padx=10, pady=5)
+    tk.Label(window, text="What is the proportion of trials that should have the laser?").grid(row=3, column=0, padx=10, pady=5)
 
     laser_Mode_Options = ["Turn on by a sensor event", "Manual Mode"]
     laser_mode_selected = tk.StringVar(window) 
@@ -382,9 +399,10 @@ def sendParams(window):
     # Finish the string input:
     if laser_selected == "Yes":
         laserSetUp(window)
-
-    #Need array of which trial will receive laser 
-    # laser_on_array=[]
+        laserSelected = 1
+    else:
+        laserSelected = 0
+    
     print(laserProb)
     num_laser_on = int(laserProb * total_samples)
     num_laser_off = total_samples - num_laser_on 
@@ -392,11 +410,9 @@ def sendParams(window):
     random.shuffle(laser_on_array)
 
     print(laser_on_array)
-
-
     
     #Laser function will update global values:
-    protocol_param_string = f'{hr_pump_time},{lr_pump_time},{l_bar_height},{r_bar_height},{prob_HR},{prob_LR},{hr_side},{ITI},{delayTime},{laser_selected},{laserMode},{laserPulseType},{laserSide},{onSensor},{onTimeDelay},{offSensor},{offTimeDelay},{laser_on_array}'
+    protocol_param_string = f'{hr_pump_time},{lr_pump_time},{l_bar_height},{r_bar_height},{prob_HR},{prob_LR},{hr_side},{ITI},{delayTime},{laserSelected},{laserMode},{laserPulseType},{laserSide},{sensorArray[onSensor]},{onTimeDelay},{sensorArray[offSensor]},{offTimeDelay},{laser_on_array}'
     
     ser.baudrate = 9600
     ser.port = selected_port

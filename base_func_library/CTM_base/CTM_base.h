@@ -15,7 +15,12 @@ class CTM_base {
                          int barrierRHeight, int barrierLHeight,
                          float prob_HR, float prob_LR,
                          int HRside, int ITI, int delayTime,
-                         int nForcetrials, int ftSide);
+                         int nForceTrials, int ftSide,
+                         int laserSelected, int laserMode,
+                         int laserPulseType, int laserSide,
+                         int onSensor, int onTimeDelay,
+                         int offSensor, int offTimeDelay,
+                         int laserOnArray[]);
     void begin();
 
     // general functions
@@ -50,6 +55,9 @@ class CTM_base {
 
     // force trial function
     void enactForceTrials();
+
+    // Laser functions
+    void checkLaser();
 
     // Button Functions
     void buttonD1Pressed();
@@ -96,6 +104,10 @@ class CTM_base {
     bool PIRLeftStartBoxActivated = false;
     bool PIRRightStartBoxPrimed = false;
     bool PIRRightStartBoxActivated = false;
+
+    // laser flags
+    bool laserPrimed = true;
+    bool laserActive = false;
     
     // timestamp variables
     unsigned long startTime;
@@ -146,9 +158,26 @@ class CTM_base {
     int PIR_LeftStartBox = 29;
     int PIR_RightStartBox = 30;
 
+    int sensorArray[] = {PIR_Start,
+                         PIR_Midstem,
+                         PIR_Endstem,
+                         PIR_LeftPostVertex,
+                         PIR_RightPostVertex,
+                         PIR_LeftPreBarrier,
+                         PIR_RightPreBarrier,
+                         PIR_LeftStartBox,
+                         PIR_RightStartBox};
+
     // reward
     int pump1Output = 5;
     int pump2Output = 2;
+
+    // laser
+    // int laserOutput = x;
+    int laserOnCondPin1;
+    int laserOnCondPin2;
+    int laserOffCondPin1;
+    int laserOffCondPin2;
 
     // Input Buttons
     int rightBarrierButton = 50;
@@ -182,7 +211,6 @@ class CTM_base {
     int _converted_bLH;
     #define MAX_RIGHT_BARRIER_HEIGHT 2630
     #define MAX_LEFT_BARRIER_HEIGHT 2170
-
     
     // choosing which side is the HR
     int _HRside;
@@ -198,6 +226,16 @@ class CTM_base {
 
     // Time delay between when a sensor is tripped and when the door closes.
     int _delayTime;
+
+    int _laserSelected; // 1 is yes, 0 is no
+    int _laserMode; // 1 is sensor, 0 is manual
+    int _laserPulseType;
+    int _laserSide; // Both: 0; HR: 1; LR: -1
+    int _laserOnCond;
+    int _laserOnTimeDelay;
+    int _laserOffCond;
+    int _laserOffTimeDelay;
+    int _laserTrials[];
 
     // number of force trials
     int _nForceTrials;
