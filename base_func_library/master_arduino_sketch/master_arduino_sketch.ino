@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 // LCD Setup:
 #include <LiquidCrystal.h>
 const int rs = 12, en = 11, d4 = 47, d5 = 45, d6 = 43, d7 = 49;
@@ -135,3 +136,5 @@ void loop() {
       shutdownComplete = true;
   }
 }
+=======
+>>>>>>> Stashed changes
