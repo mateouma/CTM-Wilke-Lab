@@ -218,6 +218,17 @@ def laser_OffSetUp(window):
         print(onSensor)
         print(onTimeDelay)
 
+        if(offSensor == "Midstem"):
+            offSensor = 0
+        elif(offSensor == "Endstem"):
+            offSensor = 1
+        elif(offSensor == "Post Vertex"):
+            offSensor = 2
+        elif(offSensor == "Pre-Barrier"):
+            offSensor = 3
+        elif(offSensor == "Start Box"):
+            offSensor = 4
+
         window.destroy()
         return
 
@@ -265,12 +276,24 @@ def laser_OnSetUp(window):
         print(onTimeDelay)
         print(laserSide)
 
-        if laserSide == "Both HR and LR Sides":
+        if(laserSide == "Both HR and LR Sides"):
             laserSide = 0
-        elif laserSide == "HR Side":
+        elif(laserSide == "HR Side"):
             laserSide = 1
-        elif laserSide == "LR Side":
-            laserSide = -1
+        elif(laserSide == "LR Side"):
+            laserSide = 2
+
+        if(onSensor == "Start"):
+            onSensor = 0
+        elif(onSensor == "Midstem"):
+            onSensor = 1
+        elif(onSensor == "Endstem"):
+            onSensor = 2
+        elif(onSensor == "Post Vertex"):
+            onSensor = 3
+        elif(onSensor == "Pre-Barrier"):
+            onSensor = 4
+            
 
         laser_OffSetUp(window)
 
@@ -316,12 +339,22 @@ def laserSetUp(window):
         print(laserPulseType)
         print(laserProb)
         print("made it")
+        if(laserProb > 1 or laserProb < 0):
+            print("Probability must be less then 1 and greater then 0")
+            quit()
+        
+        if(laserPulseType == "Constant"):
+            laserPulseType = 0
+        elif(laserPulseType == "Pulse"):
+            laserPulseType = 1
 
         if(laserMode == "Manual Mode"):
+            laserMode = 0
             window.destroy()
             laserMode = 0
             return
         elif(laserMode == "Turn on by a sensor event"):
+            laserMode = 1
             laser_OnSetUp(window)
             laserMode = 1
         else:
@@ -385,7 +418,7 @@ def sendParams(window):
        or len(prob_HR) == 0 or len(prob_LR) == 0 or len(hr_side) == 0 or len(ITI) == 0 
        or len(delayTime) == 0 or len(total_samples) == 0):
         print("Please input a value for all parameters")
-        quit()
+        # quit()
     
     total_samples = int(total_samples)
     #Take just the port value from the selected
@@ -398,11 +431,13 @@ def sendParams(window):
     
     # Finish the string input:
     if laser_selected == "Yes":
+        laser_selected = 1
         laserSetUp(window)
-        laserSelected = 1
-    else:
-        laserSelected = 0
-    
+    elif (laser_selected == "No"):
+        laser_selected = 0
+
+    #Need array of which trial will receive laser 
+    # laser_on_array=[]
     print(laserProb)
     num_laser_on = int(laserProb * total_samples)
     num_laser_off = total_samples - num_laser_on 

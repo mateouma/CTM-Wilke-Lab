@@ -73,6 +73,21 @@ void loop() {
       int laserOnArray[] = atoi(strings[17]);
       int nForceTrials = 0;
       int ftSide = 1;
+      int laserUsed = atoi(strings[9]);
+      int laserMode = atoi(strings[10]);
+      int laserPulseType = atoi(strings[11]);
+      int laserSide = atoi(strings[12]);
+      int laserOnSensor = atoi(strings[13]);
+      float laserOnDelay = atof(strings[14]);
+      int laserOffSensor = atoi(strings[15]);
+      float laserOffDelay = atof(strings[16]);
+      string laserPatternString = strings[17];
+      //Converts input array (Passed as a string) into an array of ints.
+      int laserPattern[] = [];
+      for(int i = 0; i < laserPatternString.length(); i++){
+        laserPattern[i] = atoi(laserPatternString[i]);
+      }
+
 
       mazeProtocol.configureParams(hr_pump_time, lr_pump_time,
                                    r_bar_height, l_bar_height, 
