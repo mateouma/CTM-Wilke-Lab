@@ -15,12 +15,13 @@ class CTM_base {
                          int barrierRHeight, int barrierLHeight,
                          float prob_HR, float prob_LR,
                          int HRside, int ITI, int delayTime,
+                         int totalSamples,
                          int nForceTrials, int ftSide,
                          int laserSelected, int laserMode,
                          int laserPulseType, int laserSide,
-                         int onSensor, int onTimeDelay,
-                         int offSensor, int offTimeDelay,
-                         int laserOnArray[]);
+                         int laserOnSensor, float laserOnDelay,
+                         int laserOffSensor, float laserOffDelay,
+                         float laserProb);
     void begin();
 
     // general functions
@@ -158,7 +159,7 @@ class CTM_base {
     int PIR_LeftStartBox = 29;
     int PIR_RightStartBox = 30;
 
-    int sensorArray[] = {PIR_Start,
+    int sensorArray[9] = {PIR_Start,
                          PIR_Midstem,
                          PIR_Endstem,
                          PIR_LeftPostVertex,
@@ -173,11 +174,16 @@ class CTM_base {
     int pump2Output = 2;
 
     // laser
-    // int laserOutput = x;
-    int laserOnCondPin1;
-    int laserOnCondPin2;
-    int laserOffCondPin1;
-    int laserOffCondPin2;
+    int laserOutput = 49; // Add correct pin in here.
+    // int laserOnCondPin1;
+    // int laserOnCondPin2;
+    // int laserOffCondPin1;
+    // int laserOffCondPin2;
+
+    #define MAX_ULONG 4294967295
+    bool laserOn = false; //0 means the laser is currently off, 1 means it is currently on.
+    unsigned long laserOnTime = MAX_ULONG;
+    unsigned long laserOffTime = MAX_ULONG;
 
     // Input Buttons
     int rightBarrierButton = 50;
@@ -227,15 +233,18 @@ class CTM_base {
     // Time delay between when a sensor is tripped and when the door closes.
     int _delayTime;
 
+    int _totalSamples;
+
     int _laserSelected; // 1 is yes, 0 is no
     int _laserMode; // 1 is sensor, 0 is manual
     int _laserPulseType;
     int _laserSide; // Both: 0; HR: 1; LR: -1
-    int _laserOnCond;
-    int _laserOnTimeDelay;
-    int _laserOffCond;
-    int _laserOffTimeDelay;
-    int _laserTrials[];
+    int _laserOnSensor;
+    float _laserOnTimeDelay;
+    int _laserOffSensor;
+    float _laserOffTimeDelay;
+    float _laserProb;
+
 
     // number of force trials
     int _nForceTrials;
@@ -255,6 +264,8 @@ class CTM_base {
 
     int rightPumpButtonState = 0;
     int leftPumpButtonState = 0;
+
+    int _laserTrials[10] = {1,1,1,1,1,1,1,1,1,1};
 };
 
 #endif

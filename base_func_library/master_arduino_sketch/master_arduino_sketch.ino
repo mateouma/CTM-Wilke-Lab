@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 // LCD Setup:
 #include <LiquidCrystal.h>
 const int rs = 12, en = 11, d4 = 47, d5 = 45, d6 = 43, d7 = 49;
@@ -11,7 +10,7 @@ int last_displayed_trial = -1;
 
 CTM_base mazeProtocol;
 
-char *strings[8];
+char *strings[19];
 char *ptr = NULL;
 
 bool setupComplete = false;
@@ -24,18 +23,27 @@ void setup() {
   pinMode(5, OUTPUT);
   digitalWrite(2, LOW);
   digitalWrite(5, LOW);
-
-// set up the LCD's number of columns and rows:
+  
+  // set up the LCD's number of columns and rows:
   lcd.begin(16, 2);
   lcd.print(" Welcome to the");
   lcd.setCursor(0, 1);
   lcd.print("Automated T-Maze");
+
+  Serial.println("SetUp Completed");
+
 }
 
 void loop() {
   if (!setupComplete) {
-    if (Serial.available() > 0) {
-      String msg = Serial.readString();
+//    if (Serial.available() > 0) {
+//      String msg = Serial.readString();
+      Serial.println("Here");
+      Serial.flush();
+
+      String msg = "100,100,0,0,1,0,1,100,100,10,1,1,0,0,0,0,5,0,1.0";
+      Serial.println(msg);
+      Serial.flush();
       msg.trim();
       int msg_len = msg.length() + 1; 
       char msg_array[msg_len];
@@ -43,11 +51,20 @@ void loop() {
       byte index = 0;
       ptr = strtok(msg_array, ",");
 
-      while (ptr != NULL) {
-        strings[index] = ptr;
-        index++;
-        ptr = strtok(NULL, ",");
-      }
+     while (ptr != NULL) {
+       strings[index] = ptr;
+       index++;
+       ptr = strtok(NULL, ",");
+     }
+
+// // Add everything except for the array into strings
+//       while (ptr != NULL && index < 18) {
+//         strings[index] = ptr;
+//         index++;
+//         ptr = strtok(NULL, ",");
+//       }
+      
+      
       int hr_pump_time = atoi(strings[0]);
       int lr_pump_time = atoi(strings[1]);
       int l_bar_height = atoi(strings[2]);
@@ -62,31 +79,40 @@ void loop() {
       //Serial.print(strings[5]);
       int ITI = atoi(strings[7]);
       int delayTime = atoi(strings[8]);
-      int laserSelected = atoi(strings[9]);
-      int laserMode = atoi(strings[10]);
-      int laserPulseType = atoi(strings[11]);
-      int laserSide = atoi(strings[12]);
-      int onSensor = atoi(strings[13]);
-      int onTimeDelay = atoi(strings[14]);
-      int offSensor = atoi(strings[15]);
-      int offTimeDelay = atoi(strings[16]);
-      int laserOnArray[] = atoi(strings[17]);
+      int totalSamples = atoi(strings[9]);
       int nForceTrials = 0;
       int ftSide = 1;
-      int laserUsed = atoi(strings[9]);
-      int laserMode = atoi(strings[10]);
-      int laserPulseType = atoi(strings[11]);
-      int laserSide = atoi(strings[12]);
-      int laserOnSensor = atoi(strings[13]);
-      float laserOnDelay = atof(strings[14]);
-      int laserOffSensor = atoi(strings[15]);
-      float laserOffDelay = atof(strings[16]);
-      string laserPatternString = strings[17];
+      int laserSelected = atoi(strings[10]);
+      int laserMode = atoi(strings[11]);
+      int laserPulseType = atoi(strings[12]);
+      int laserSide = atoi(strings[13]);
+      int laserOnSensor = atoi(strings[14]);
+      float laserOnDelay = atof(strings[15]);
+      int laserOffSensor = atoi(strings[16]);
+      float laserOffDelay = atof(strings[17]);
+      float laserProb = atof(strings[18]);
+
+
+      
+//      String laserPatternString = strings[17];
       //Converts input array (Passed as a string) into an array of ints.
-      int laserPattern[] = [];
-      for(int i = 0; i < laserPatternString.length(); i++){
-        laserPattern[i] = atoi(laserPatternString[i]);
-      }
+
+      // int laserOnArray[totalSamples] = {};
+      // index = 0;
+      // //Capture Laser Array:
+      // while (ptr != NULL) {
+      //   laserOnArray[index] = atoi(ptr);
+      //   index++;
+      //   ptr = strtok(NULL, ",");
+      // }
+
+
+
+//      int laserOnArrayptr = &laserOnArray[0];
+//      int laserPattern[] = {};
+//      for(int i = 17; i < strings.length(); i++){
+//        laserPattern[i-17] = atoi(strings[i]);
+//      }
 
 
       mazeProtocol.configureParams(hr_pump_time, lr_pump_time,
@@ -94,13 +120,26 @@ void loop() {
                                    prob_HR, prob_LR, 
                                    hr_side, 
                                    ITI, 
-                                   delayTime, 
+                                   delayTime, totalSamples, 
                                    nForceTrials, ftSide,
                                    laserSelected, laserMode,
                                    laserPulseType, laserSide,
-                                   onSensor, onTimeDelay,
-                                   offSensor, offTimeDelay,
-                                   laserOnArray);
+                                   laserOnSensor, laserOnDelay,
+                                   laserOffSensor, laserOffDelay,
+                                   laserProb);
+
+//      mazeProtocol.configureParams(100, 100,
+//                                   10, 0, 
+//                                   1, 0, 
+//                                   1, 
+//                                   100, 
+//                                   100, 10, 
+//                                   nForceTrials, ftSide,
+//                                   laserSelected, laserMode,
+//                                   laserPulseType, laserSide,
+//                                   laserOnSensor, laserOnDelay,
+//                                   laserOffSensor, laserOffDelay,
+//                                   laserOnArray);
       mazeProtocol.begin();
       mazeProtocol.printConfigParams();
 
@@ -116,7 +155,7 @@ void loop() {
       if (nForceTrials > 0) {
         mazeProtocol.enactForceTrials();
       }
-    }
+//  }
   } else if (setupComplete && !trialsComplete){
       mazeProtocol.checkSensors();
       mazeProtocol.checkButtons();
@@ -151,5 +190,3 @@ void loop() {
       shutdownComplete = true;
   }
 }
-=======
->>>>>>> Stashed changes

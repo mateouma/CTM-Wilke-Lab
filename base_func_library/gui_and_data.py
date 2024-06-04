@@ -40,14 +40,14 @@ import random
 # original_sigint = signal.getsignal(signal.SIGINT)
 # signal.signal(signal.SIGINT, signal_handler)
 
-onSensor = ""
-offSensor = ""
+onSensor = "Start"
+offSensor = "Midstem"
 onTimeDelay = 0
 offTimeDelay = 0
-laserSide = "Both HR and LR Sides" # Both sides turn on
+laserSide = 0 # Both sides turn on
 laserProb = 0
 laserPulseType = 0 #0 is constant and 1 is pulse
-laserMode = "" #If it is manual or sensor event
+laserMode = 0 #If it is manual or sensor event
 
 file_name = ""
 total_samples = 0
@@ -57,8 +57,8 @@ sensorArray = {
     "Midstem":1,
     "Endstem":2,
     "Post Vertex": 3,
-    "Pre-Barrier": 5,
-    "Start Box": 7
+    "Pre-Barrier": 4,
+    "Start Box": 5
 }
 
 # Serial connection
@@ -218,16 +218,16 @@ def laser_OffSetUp(window):
         print(onSensor)
         print(onTimeDelay)
 
-        if(offSensor == "Midstem"):
-            offSensor = 0
-        elif(offSensor == "Endstem"):
-            offSensor = 1
-        elif(offSensor == "Post Vertex"):
-            offSensor = 2
-        elif(offSensor == "Pre-Barrier"):
-            offSensor = 3
-        elif(offSensor == "Start Box"):
-            offSensor = 4
+        # if(offSensor == "Midstem"):
+        #     offSensor = 0
+        # elif(offSensor == "Endstem"):
+        #     offSensor = 1
+        # elif(offSensor == "Post Vertex"):
+        #     offSensor = 2
+        # elif(offSensor == "Pre-Barrier"):
+        #     offSensor = 3
+        # elif(offSensor == "Start Box"):
+        #     offSensor = 4
 
         window.destroy()
         return
@@ -273,6 +273,7 @@ def laser_OnSetUp(window):
         onTimeDelay = laser_on_time_delay_selected.get()
         laserSide = laser_trial_type_selected.get()
         print(onSensor)
+        print(sensorArray[onSensor])
         print(onTimeDelay)
         print(laserSide)
 
@@ -283,17 +284,16 @@ def laser_OnSetUp(window):
         elif(laserSide == "LR Side"):
             laserSide = 2
 
-        if(onSensor == "Start"):
-            onSensor = 0
-        elif(onSensor == "Midstem"):
-            onSensor = 1
-        elif(onSensor == "Endstem"):
-            onSensor = 2
-        elif(onSensor == "Post Vertex"):
-            onSensor = 3
-        elif(onSensor == "Pre-Barrier"):
-            onSensor = 4
-            
+        # if(onSensor == "Start"):
+        #     onSensor = 0
+        # elif(onSensor == "Midstem"):
+        #     onSensor = 1
+        # elif(onSensor == "Endstem"):
+        #     onSensor = 2
+        # elif(onSensor == "Post Vertex"):
+        #     onSensor = 3
+        # elif(onSensor == "Pre-Barrier"):
+        #     onSensor = 4
 
         laser_OffSetUp(window)
 
@@ -412,7 +412,7 @@ def sendParams(window):
     delayTime = entry_delayTime.get()
     total_samples = entry_Samples.get()
     file_name = entry_file_name.get()
-    laser_selected = entry_laser_selected.get()
+    laserSelected = entry_laserSelected.get()
 
     if(len(hr_pump_time) == 0 or len(lr_pump_time) == 0 or len(l_bar_height) == 0 or len(r_bar_height) == 0 
        or len(prob_HR) == 0 or len(prob_LR) == 0 or len(hr_side) == 0 or len(ITI) == 0 
@@ -421,34 +421,42 @@ def sendParams(window):
         # quit()
     
     total_samples = int(total_samples)
+    print(total_samples)
     #Take just the port value from the selected
     selected_port = port_selected.get().split(' ')[0]
     if selected_port == "Select": 
         print("Please Select a Port")
         quit()
 
-    print(laser_selected)
+    print(laserSelected)
     
     # Finish the string input:
-    if laser_selected == "Yes":
-        laser_selected = 1
+    if laserSelected == "Yes":
+        laserSelected = 1
         laserSetUp(window)
-    elif (laser_selected == "No"):
-        laser_selected = 0
+        #Need array of which trial will receive laser 
+        # laser_on_array=[]
+        print(laserProb)
 
-    #Need array of which trial will receive laser 
-    # laser_on_array=[]
-    print(laserProb)
-    num_laser_on = int(laserProb * total_samples)
-    num_laser_off = total_samples - num_laser_on 
-    laser_on_array = [1] * num_laser_on + [0] * num_laser_off
-    random.shuffle(laser_on_array)
+        # Code that generates the array of times the laser is on.
+        # num_laser_on = int(laserProb * total_samples)
+        # num_laser_off = total_samples - num_laser_on 
+        # laser_on_array = [1] * num_laser_on + [0] * num_laser_off
+        # random.shuffle(laser_on_array)
 
-    print(laser_on_array)
+        # print(laser_on_array)
+
+    elif (laserSelected == "No"):
+        laserSelected = 0
+        # laser_on_array = [0 for i in range(total_samples)]
+
     
+    print(total_samples)
     #Laser function will update global values:
-    protocol_param_string = f'{hr_pump_time},{lr_pump_time},{l_bar_height},{r_bar_height},{prob_HR},{prob_LR},{hr_side},{ITI},{delayTime},{laserSelected},{laserMode},{laserPulseType},{laserSide},{sensorArray[onSensor]},{onTimeDelay},{sensorArray[offSensor]},{offTimeDelay},{laser_on_array}'
+    protocol_param_string = f'{hr_pump_time},{lr_pump_time},{l_bar_height},{r_bar_height},{prob_HR},{prob_LR},{hr_side},{ITI},{delayTime},{total_samples},{laserSelected},{laserMode},{laserPulseType},{laserSide},{sensorArray[onSensor]},{onTimeDelay},{sensorArray[offSensor]},{offTimeDelay},{laserProb}'
     
+    protocol_param_string = "10,10,10,10,10,10,1,10,10,10,0,0,0,0,0,0,1,0,0"
+
     ser.baudrate = 9600
     ser.port = selected_port
     ser.open()
@@ -520,10 +528,10 @@ entry_Samples.grid(row=9, column=1, padx=10, pady=5)
 entry_file_name = tk.Entry(window)
 entry_file_name.grid(row=10, column=1, padx=10, pady=5)
 
-entry_laser_selected = tk.StringVar(window) 
-entry_laser_selected.set("No") 
+entry_laserSelected = tk.StringVar(window) 
+entry_laserSelected.set("No") 
 optionList = ["No", "Yes"]
-dropdown_menu = tk.OptionMenu(window, entry_laser_selected, *optionList) 
+dropdown_menu = tk.OptionMenu(window, entry_laserSelected, *optionList) 
 dropdown_menu.grid(row=11, column=1, padx=10, pady=5)
 
 port_selected = tk.StringVar(window) 
@@ -549,8 +557,8 @@ option_button2.grid(row=6, column=1, padx=10, pady=5)
 # Create the button
 button = tk.Button(window, text="Run Arduino Script", command=lambda: sendParams(window))
 button.grid(row=13, column=1, padx=10, pady=5)
-button2 = tk.Button(window, text="Run Testing Script", command=lambda: sendTestParams())
-button2.grid(row=14, column=1, padx=10, pady=5)
+# button2 = tk.Button(window, text="Run Testing Script", command=lambda: sendTestParams())
+# button2.grid(row=14, column=1, padx=10, pady=5)
 
 #button2 = tk.Button(window, text="Close Window", command=window.destroy())
 #button2.grid(row=7, column=2, padx=10, pady=5)

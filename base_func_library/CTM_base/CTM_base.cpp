@@ -15,12 +15,13 @@ void CTM_base::configureParams(int HRTime, int LRTime,
                                int barrierRHeight, int barrierLHeight,
                                float prob_HR, float prob_LR,
                                int HRside, int ITI, int delayTime,
+                               int totalSamples,
                                int nForceTrials, int ftSide,
                                int laserSelected, int laserMode,
                                int laserPulseType, int laserSide,
-                               int onSensor, int onTimeDelay,
-                               int offSensor, int offTimeDelay,
-                               int laserOnArray[]) {
+                               int laserOnSensor, float laserOnDelay,
+                               int laserOffSensor, float laserOffDelay,
+                               float laserProb) {
   // HIGH REWARD = 1
   // LOW REWARD = 0
 
@@ -33,17 +34,32 @@ void CTM_base::configureParams(int HRTime, int LRTime,
   _prob_LR = prob_LR;
   _ITI = ITI;
   _delayTime = delayTime;
+  _totalSamples = totalSamples;
   _nForceTrials = nForceTrials;
   _ftSide = ftSide;
   _laserSelected = laserSelected;
   _laserMode = laserMode;
   _laserPulseType = laserPulseType;
   _laserSide = laserSide; // HR is 1, LR is 0, both is 2
-  _laserOnCond = onSensor;
-  _laserOnTimeDelay = onTimeDelay;
-  _laserOffCond = offSensor;
-  _laserOffTimeDelay = offTimeDelay;
-  _laserTrials = laserOnArray;
+  _laserOnSensor = laserOnSensor;
+  _laserOnTimeDelay = laserOnDelay;
+  _laserOffSensor = laserOffSensor;
+  _laserOffTimeDelay = laserOffDelay;
+  _laserProb = laserProb;
+
+  //Initiate the laser on array of all 0s:
+  // _laserTrials[_totalSamples] = {0};
+
+  // if (_laserSelected){
+  //   int numberOnTrials = (_laserProb * _totalSamples);
+  //   for (int i = 0; i < numberOnTrials; i++){
+  //     _laserTrials[i] = 1;
+  //   }
+  //   // Should randomly shuffle the array of on values.
+  //   // random_shuffle(&laserOnArray[0], &laserOnArray[_totalSamples]);
+  // }
+  // _laserTrials = [0,0,0,0,0,0,0,0,0,0];
+  // _laserTrials = laserOnArray;
 
   // HRside: R is 1, L is 0  
   if (HRside == 1) {
@@ -117,21 +133,21 @@ void CTM_base::begin() {
   digitalWrite(outputD3, HIGH); // Open D3
   isD3Open = true;
 
-  if (_laserOnCond == 3 || _laserOnCond == 5) {
-    laserOnCondPin1 = sensorArray[_laserOnCond];
-    laserOnCondPin2 = sensorArray[_laserOnCond+1];
-  } else {
-    laserOnCondPin1 = sensorArray[_laserOnCond];
-    laserOnCondPin2 = sensorArray[_laserOnCond];
-  }
+  // if (_laserOnSensor == 3 || _laserOnSensor == 5) {
+  //   laserOnCondPin1 = sensorArray[_laserOnSensor];
+  //   laserOnCondPin2 = sensorArray[_laserOnSensor+1];
+  // } else {
+  //   laserOnCondPin1 = sensorArray[_laserOnSensor];
+  //   laserOnCondPin2 = sensorArray[_laserOnSensor];
+  // }
 
-  if (_laserOnCond == 3 || _laserOnCond == 5) {
-    laserOffCondPin1 = sensorArray[_laserOffCond];
-    laserOffCondPin2 = sensorArray[_laserOffCond+1];
-  } else {
-    laserOffCondPin1 = sensorArray[_laserOffCond];
-    laserOffCondPin2 = sensorArray[_laserOffCond];
-  }
+  // if (_laserOnSensor == 3 || _laserOnSensor == 5) {
+  //   laserOffCondPin1 = sensorArray[_laserOffSensor];
+  //   laserOffCondPin2 = sensorArray[_laserOffSensor+1];
+  // } else {
+  //   laserOffCondPin1 = sensorArray[_laserOffSensor];
+  //   laserOffCondPin2 = sensorArray[_laserOffSensor];
+  // }
 
   delay(500);
 
@@ -177,6 +193,59 @@ void CTM_base::printConfigParams() {
   Serial.print("HR Reward Probability on LR Side: ");
   Serial.print(_prob_LR);
   Serial.print("\n");
+
+  Serial.print("Inter-Trial Interval: ");
+  Serial.print(_ITI);
+  Serial.print("\n");
+
+  Serial.print("Door Delay Time After Sensor Tripped: ");
+  Serial.print(_delayTime);
+  Serial.print("\n");
+
+  if(_laserSelected){
+    Serial.print("Laser is Selected: ");
+    Serial.print("\n");
+
+    Serial.print("Laser Mode: ");
+    Serial.print(_laserMode);
+    Serial.print("\n");
+
+    Serial.print("Laser Pulse Type: ");
+    Serial.print(_laserPulseType);
+    Serial.print("\n");
+
+    Serial.print("Laser On Side: ");
+    Serial.print(_laserSide);
+    Serial.print("\n");
+
+    Serial.print("Laser On Sensor: ");
+    Serial.print(_laserOnSensor);
+    Serial.print("\n");
+
+    Serial.print("Laser On Time Delay: ");
+    Serial.print(_laserOnTimeDelay);
+    Serial.print("\n");
+
+    Serial.print("Laser Off Sensor: ");
+    Serial.print(_laserOffSensor);
+    Serial.print("\n");
+
+    Serial.print("Laser Off Time Delay: ");
+    Serial.print(_laserOffTimeDelay);
+    Serial.print("\n");
+
+    // Print out the pattern that we will use:
+    Serial.print("Laser On Pattern: ");
+    for(int i = 0; i < 10; i++){
+      Serial.print(_laserTrials[i]);
+      Serial.print(",");
+    }
+    Serial.print("\n");
+  }
+  else{
+    Serial.print("Laser Off");
+    Serial.print("\n");
+  }
 }
 
 void CTM_base::resetBarriers() {
@@ -297,6 +366,21 @@ void CTM_base::ActivatePIRStart() {
     
     PIRStartPrimed = false; // Set trial active to FALSE so this can't get called again until the trial resets
     PIRStartActivated = true; // Set PIR Active to TRUE
+
+    //If we are using the laser and the mode is turn on by sensor:
+    if(_laserSelected && _laserMode == 1){
+      // Set when we need to turn on the laser
+      if(_laserOnSensor == 0 && _laserTrials[currTrial-1] == 1){
+        laserOnTime = currentTime+_laserOnTimeDelay;
+        Serial.print("PIR Start Activated Laser: ");
+        Serial.print(laserOnTime);
+        Serial.print("\n");
+      }
+      // Set when we need to turn off the laser
+      if(_laserOffSensor == 0){
+        laserOffTime = currentTime+_laserOffTimeDelay;
+      }
+    }
     
     PIRStartOpenD1D2D3(); // Call function to open doors 1, 2, and 3
   }
@@ -313,6 +397,17 @@ void CTM_base::ActivatePIRMidstem() {
     PIRMidstemActivated = true; 
 
     PIREndstemPrimed = true;
+
+  if(_laserSelected && _laserMode == 1){
+    // Set when we need to turn on the laser
+    if(_laserOnSensor == 1 && _laserTrials[currTrial-1] == 1){
+      laserOnTime = currentTime+_laserOnTimeDelay;
+    }
+    // Set when we need to turn off the laser
+    if(_laserOffSensor == 1){
+      laserOffTime = currentTime+_laserOffTimeDelay;
+    }
+  }
     
     //PIRMidstemCloseD1();
   }
@@ -330,6 +425,17 @@ void CTM_base::ActivatePIREndstem() {
   
     PIRLeftPostVertexPrimed = true; // Prime post LPV sensor
     PIRRightPostVertexPrimed = true; // Prime post-RPV sensor
+
+    if(_laserSelected && _laserMode == 1){
+    // Set when we need to turn on the laser
+      if(_laserOnSensor == 2 && _laserTrials[currTrial-1] == 1){
+        laserOnTime = currentTime+_laserOnTimeDelay;
+      }
+      // Set when we need to turn off the laser
+      if(_laserOffSensor == 2){
+        laserOffTime = currentTime+_laserOffTimeDelay;
+      }
+    }
   }
   // If the endstem PIR is triggered and the Start is triggered but the midstem PIR has not been triggered yet, allow the trial to continue:
   else if (digitalRead(PIR_Endstem) && !PIRMidstemActivated && !PIREndstemActivated && PIRStartActivated){
@@ -350,6 +456,17 @@ void CTM_base::ActivatePIREndstem() {
   
     PIRLeftPostVertexPrimed = true; // Prime post LPV sensor
     PIRRightPostVertexPrimed = true; // Prime post-RPV sensor
+
+    if(_laserSelected && _laserMode == 1){
+    // Set when we need to turn on the laser
+      if(_laserOnSensor == 2 && _laserTrials[currTrial-1] == 1){
+        laserOnTime = currentTime+_laserOnTimeDelay;
+      }
+      // Set when we need to turn off the laser
+      if(_laserOffSensor == 2){
+        laserOffTime = currentTime+_laserOffTimeDelay;
+      }
+    }
   }
 }
 
@@ -364,6 +481,17 @@ void CTM_base::ActivatePIRLeftPostVertex() {
   
     PIRLeftPreBarrierPrimed = true;
     // PIRRightPreBarrierPrimed = false;
+
+    if(_laserSelected && _laserMode == 1){
+    // Set when we need to turn on the laser
+      if(_laserOnSensor == 3 && _laserTrials[currTrial-1] == 1){
+        laserOnTime = currentTime+_laserOnTimeDelay;
+      }
+      // Set when we need to turn off the laser
+      if(_laserOffSensor == 3){
+        laserOffTime = currentTime+_laserOffTimeDelay;
+      }
+    }
   }
 }
 
@@ -378,6 +506,17 @@ void CTM_base::ActivatePIRRightPostVertex() {
   
     // PIRLeftPreBarrierPrimed = false;
     PIRRightPreBarrierPrimed = true;
+
+    if(_laserSelected && _laserMode == 1){
+    // Set when we need to turn on the laser
+      if(_laserOnSensor == 3 && _laserTrials[currTrial-1] == 1){
+        laserOnTime = currentTime+_laserOnTimeDelay;
+      }
+      // Set when we need to turn off the laser
+      if(_laserOffSensor == 3){
+        laserOffTime = currentTime+_laserOffTimeDelay;
+      }
+    }
   }
 }
 
@@ -391,6 +530,17 @@ void CTM_base::ActivatePIRLeftPreBarrier() {
     // PIRLeftPreBarrierPrimed = false; // Un-prime PIRLPB
     // PIRRightPreBarrierPrimed = false;
     PIRLeftPreBarrierActivated = true;
+
+    if(_laserSelected && _laserMode == 1){
+    // Set when we need to turn on the laser
+      if(_laserOnSensor == 4 && _laserTrials[currTrial-1] == 1){
+        laserOnTime = currentTime+_laserOnTimeDelay;
+      }
+      // Set when we need to turn off the laser
+      if(_laserOffSensor == 4){
+        laserOffTime = currentTime+_laserOffTimeDelay;
+      }
+    }
     
     PIRLPBCloseD2D3D5OpenD4();
   }
@@ -407,6 +557,17 @@ void CTM_base::ActivatePIRRightPreBarrier() {
     // PIRLeftPreBarrierPrimed = false;
     
     PIRRightPreBarrierActivated = true;
+
+    if(_laserSelected && _laserMode == 1){
+    // Set when we need to turn on the laser
+      if(_laserOnSensor == 4 && _laserTrials[currTrial-1] == 1){
+        laserOnTime = currentTime+_laserOnTimeDelay;
+      }
+      // Set when we need to turn off the laser
+      if(_laserOffSensor == 4){
+        laserOffTime = currentTime+_laserOffTimeDelay;
+      }
+    }
     
     PIRRPBCloseD3D2D4OpenD5();
   }
@@ -421,6 +582,17 @@ void CTM_base::ActivatePIRLeftStartBox() {
     
     PIRLeftStartBoxPrimed = false;
     PIRLeftStartBoxActivated = true;
+
+    if(_laserSelected && _laserMode == 1){
+    // Set when we need to turn on the laser
+      if(_laserOnSensor == 5 && _laserTrials[currTrial-1] == 1){
+        laserOnTime = currentTime+_laserOnTimeDelay;
+      }
+      // Set when we need to turn off the laser
+      if(_laserOffSensor == 5){
+        laserOffTime = currentTime+_laserOffTimeDelay;
+      }
+    }
     
     PIRLSBCloseD4(); // Close D4 function
   }
@@ -435,6 +607,17 @@ void CTM_base::ActivatePIRRightStartBox() {
     
     PIRRightStartBoxPrimed = false;
     PIRRightStartBoxActivated = true;
+    
+    if(_laserSelected && _laserMode == 1){
+    // Set when we need to turn on the laser
+      if(_laserOnSensor == 5 && _laserTrials[currTrial-1] == 1){
+        laserOnTime = currentTime+_laserOnTimeDelay;
+      }
+      // Set when we need to turn off the laser
+      if(_laserOffSensor == 5){
+        laserOffTime = currentTime+_laserOffTimeDelay;
+      }
+    }
 
     PIRRSBCloseD5(); // Close D5 function
   }
@@ -775,26 +958,74 @@ void CTM_base::PIRRSBCloseD5() {
 }
 
 void CTM_base::checkLaser() {
-  // to-do: digital write const or pulse to pin
-  if (_laserMode == 1) {
-    if (laserTrials[currTrial-1]) {
-      if ((digitalRead(laserOnCondPin1) || digitalRead(laserOnCondPin2))&& laserPrimed && !laserActive) {
-        currentTime = millis();
-        Serial.print("Laser ON Time: ");
-        Serial.print(currentTime);
-        Serial.print("\n");
-        laserActive = true;
-        laserPrimed = false;
-      }
+  // // to-do: digital write const or pulse to pin
+  // Serial.print("Current Time ");
+  // Serial.print(currentTime);
+  // Serial.print("\n");
 
-      if ((digitalRead(laserOnCondPin1) || digitalRead(laserOffCondPin2)) && laserActive) {
-        currentTime = millis();
-        Serial.print("Laser OFF Time: ");
-        Serial.print(currentTime);
-        Serial.print("\n");
-        laserActive = false;
-      }
+  // Serial.print("Laser Off Time: ");
+  // Serial.print(laserOffTime);
+  // Serial.print("\n");
+  
+  // Serial.print("Laser On Time: ");
+  // Serial.print(laserOnTime);
+  // Serial.print("\n");
+
+  if (_laserMode == 1) {
+    currentTime = millis();
+    if(laserOn == true && currentTime >= laserOffTime){
+      digitalWrite(laserOutput, LOW);
+      Serial.print("Laser Turned Off Time: ");
+      Serial.print(currentTime);
+      Serial.print("\n");
+      
+      Serial.print("laserOffTime: ");
+      Serial.print(laserOffTime);
+      Serial.print("\n");
+
+      laserOffTime = MAX_ULONG;
+      laserOn = false;
+      Serial.print("laserOffTime: ");
+      Serial.print(laserOffTime);
+      Serial.print("\n");
     }
+    else if(laserOn == false && currentTime >= laserOnTime){
+      digitalWrite(laserOutput, HIGH);
+      Serial.print("Laser Turned On Time: ");
+      Serial.print(currentTime);
+      Serial.print("\n");
+
+      Serial.print("laserOnTime: ");
+      Serial.print(laserOnTime);
+      Serial.print("\n");
+
+      laserOnTime = MAX_ULONG;
+      Serial.print("laserOnTime: ");
+      Serial.print(laserOnTime);
+      Serial.print("\n");
+      laserOn = true;
+    }
+    
+  //   if (laserTrials[currTrial-1]) {
+  //     if ((digitalRead(laserOnCondPin1) || digitalRead(laserOnCondPin2))&& laserPrimed && !laserActive) {
+  //       currentTime = millis();
+  //       Serial.print("Laser ON Time: ");
+  //       Serial.print(currentTime);
+  //       Serial.print("\n");
+  //       laserActive = true;
+  //       laserPrimed = false;
+  //     }
+
+  //     if ((digitalRead(laserOnCondPin1) || digitalRead(laserOffCondPin2)) && laserActive) {
+  //       currentTime = millis();
+  //       Serial.print("Laser OFF Time: ");
+  //       Serial.print(currentTime);
+  //       Serial.print("\n");
+  //       laserActive = false;
+  //     }
+  //   }
+
+
   }
 }
 
