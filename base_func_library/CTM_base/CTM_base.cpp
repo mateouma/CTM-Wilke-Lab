@@ -147,6 +147,10 @@ void CTM_base::printConfigParams() {
   Serial.print("HR Reward Probability on LR Side: ");
   Serial.print(_prob_LR);
   Serial.print("\n");
+
+  Serial.print("Door Close Delay: ");
+  Serial.print(_delayTime);
+  Serial.print(" (ms) \n");
 }
 
 void CTM_base::resetBarriers() {

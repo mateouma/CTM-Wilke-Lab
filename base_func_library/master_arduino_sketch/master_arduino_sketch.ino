@@ -10,7 +10,7 @@ int last_displayed_trial = -1;
 
 CTM_base mazeProtocol;
 
-char *strings[8];
+char *strings[9];
 char *ptr = NULL;
 
 bool setupComplete = false;

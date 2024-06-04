@@ -197,7 +197,7 @@ def sendParams():
     hr_side = option_var.get()
     ITI = entry_ITI.get()
     delayTime = entry_delayTime.get()
-    protocol_param_string = f'{hr_pump_time},{lr_pump_time},{l_bar_height},{r_bar_height},{prob_HR},{prob_LR},{hr_side},{ITI},{delayTime}'
+    protocol_param_string = f'{hr_pump_time},{lr_pump_time},{l_bar_height},{r_bar_height},{prob_HR},{prob_LR},{hr_side},{ITI},{delayTime},EOF'
     
     print(protocol_param_string)
     # Write protocol variables to Serial in form of a string
@@ -208,7 +208,7 @@ def sendParams():
     return
 
 def sendTestParams():    
-    protocol_param_string = "1000,500,0,0,1,0,1,100,100"
+    protocol_param_string = "123,500,0,0,1,0,1,100,1000,EOF"
     
     print(protocol_param_string)
     # Write protocol variables to Serial in form of a string
