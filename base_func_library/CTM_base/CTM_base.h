@@ -174,7 +174,7 @@ class CTM_base {
     int pump2Output = 2;
 
     // laser
-    int laserOutput = 49; // Add correct pin in here.
+    int laserOutput = 52; // Add correct pin in here.
     // int laserOnCondPin1;
     // int laserOnCondPin2;
     // int laserOffCondPin1;

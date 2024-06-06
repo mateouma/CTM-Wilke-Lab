@@ -23,6 +23,9 @@ void setup() {
   pinMode(5, OUTPUT);
   digitalWrite(2, LOW);
   digitalWrite(5, LOW);
+
+  digitalWrite(52, LOW);
+  
   
   // set up the LCD's number of columns and rows:
   lcd.begin(16, 2);
@@ -41,7 +44,7 @@ void loop() {
       Serial.println("Here");
       Serial.flush();
 
-      String msg = "100,100,0,0,1,0,1,100,100,10,1,1,0,0,0,0,5,0,1.0";
+      String msg = "100,100,0,0,1,0,1,100,100,10,1,1,0,0,0,0,5,0,1.0,EOF";
       Serial.println(msg);
       Serial.flush();
       msg.trim();

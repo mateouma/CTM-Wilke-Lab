@@ -69,6 +69,9 @@ void CTM_base::configureParams(int HRTime, int LRTime,
     _rightReward = 0; // lower reward
     _leftReward = 1; // higher reward
   }
+  pinMode(laserOutput, OUTPUT);
+  digitalWrite(laserOutput, LOW);
+
 }
 
 void CTM_base::begin() {
@@ -984,10 +987,10 @@ void CTM_base::checkLaser() {
       Serial.print("\n");
 
       laserOffTime = MAX_ULONG;
-      laserOn = false;
       Serial.print("laserOffTime: ");
       Serial.print(laserOffTime);
       Serial.print("\n");
+      laserOn = false;
     }
     else if(laserOn == false && currentTime >= laserOnTime){
       digitalWrite(laserOutput, HIGH);
