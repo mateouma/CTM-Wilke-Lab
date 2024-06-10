@@ -2,7 +2,7 @@
 // MOTOR TO RELAY PINS
 // ============================
 
-int D1Pin = 49; //LEDState changed to D1Pin
+int D1Pin = 40; //LEDState changed to D1Pin
 int D2Pin = 41;
 int D3Pin = 42;
 int D4Pin = 43;
