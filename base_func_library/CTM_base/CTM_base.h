@@ -19,8 +19,8 @@ class CTM_base {
                          int nForceTrials, int ftSide,
                          int laserSelected, int laserMode,
                          int laserPulseType, int laserSide,
-                         int laserOnSensor, float laserOnDelay,
-                         int laserOffSensor, float laserOffDelay,
+                         int laserOnSensor, unsigned long laserOnDelay,
+                         int laserOffSensor, unsigned long laserOffDelay,
                          float laserProb);
     void begin();
 
@@ -59,6 +59,7 @@ class CTM_base {
 
     // Laser functions
     void checkLaser();
+    void shuffle(int *array, size_t n);
 
     // Button Functions
     void buttonD1Pressed();
@@ -240,9 +241,9 @@ class CTM_base {
     int _laserPulseType;
     int _laserSide; // Both: 0; HR: 1; LR: -1
     int _laserOnSensor;
-    float _laserOnTimeDelay;
+    unsigned long _laserOnTimeDelay;
     int _laserOffSensor;
-    float _laserOffTimeDelay;
+    unsigned long _laserOffTimeDelay;
     float _laserProb;
 
 
@@ -265,7 +266,7 @@ class CTM_base {
     int rightPumpButtonState = 0;
     int leftPumpButtonState = 0;
 
-    int _laserTrials[10] = {1,1,1,1,1,1,1,1,1,1};
+    int _laserTrials[100] = {0};
 };
 
 #endif

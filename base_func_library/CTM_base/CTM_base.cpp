@@ -19,8 +19,8 @@ void CTM_base::configureParams(int HRTime, int LRTime,
                                int nForceTrials, int ftSide,
                                int laserSelected, int laserMode,
                                int laserPulseType, int laserSide,
-                               int laserOnSensor, float laserOnDelay,
-                               int laserOffSensor, float laserOffDelay,
+                               int laserOnSensor, unsigned long laserOnDelay,
+                               int laserOffSensor, unsigned long laserOffDelay,
                                float laserProb) {
   // HIGH REWARD = 1
   // LOW REWARD = 0
@@ -47,17 +47,26 @@ void CTM_base::configureParams(int HRTime, int LRTime,
   _laserOffTimeDelay = laserOffDelay;
   _laserProb = laserProb;
 
-  //Initiate the laser on array of all 0s:
-  // _laserTrials[_totalSamples] = {0};
+  Serial.print("About to set Array up \n");
 
-  // if (_laserSelected){
-  //   int numberOnTrials = (_laserProb * _totalSamples);
-  //   for (int i = 0; i < numberOnTrials; i++){
-  //     _laserTrials[i] = 1;
-  //   }
+  if (_laserSelected){
+    // Initiate the laser on array of all 0s:
+    // _laserTrials[_totalSamples] = {0};
+    int numberOnTrials = (_laserProb * _totalSamples);
+    for (int i = 0; i < numberOnTrials; i++){
+      _laserTrials[i] = 1;
+    }
+
+    Serial.print("Outputting array: \n");
+    for (int i = 0; i < _totalSamples; i++){
+      Serial.print(_laserTrials[i]);
+    }
+
+    int* laserArrayPointer = &_laserTrials[0];
+    shuffle(laserArrayPointer, _totalSamples);
   //   // Should randomly shuffle the array of on values.
   //   // random_shuffle(&laserOnArray[0], &laserOnArray[_totalSamples]);
-  // }
+  }
   // _laserTrials = [0,0,0,0,0,0,0,0,0,0];
   // _laserTrials = laserOnArray;
 
@@ -239,10 +248,11 @@ void CTM_base::printConfigParams() {
 
     // Print out the pattern that we will use:
     Serial.print("Laser On Pattern: ");
-    for(int i = 0; i < 10; i++){
+    for(int i = 0; i < _totalSamples-1; i++){
       Serial.print(_laserTrials[i]);
       Serial.print(",");
     }
+    Serial.print(_laserTrials[_totalSamples-1]);
     Serial.print("\n");
   }
   else{
@@ -1452,4 +1462,26 @@ void CTM_base::calibrateBarriers(){
     delay(5000);
     resetBarriers();
   }
+}
+
+
+
+
+/* Arrange the N elements of ARRAY in random order.
+   Only effective if N is much smaller than RAND_MAX;
+   if this may not be the case, use a better random
+   number generator. */
+void CTM_base::shuffle(int *array, size_t n)
+{
+    if (n > 1) 
+    {
+        size_t i;
+        for (i = 0; i < n - 1; i++) 
+        {
+          size_t j = i + rand() / (RAND_MAX / (n - i) + 1);
+          int t = array[j];
+          array[j] = array[i];
+          array[i] = t;
+        }
+    }
 }

@@ -33,18 +33,18 @@ void setup() {
   lcd.setCursor(0, 1);
   lcd.print("Automated T-Maze");
 
-  Serial.println("SetUp Completed");
+//  Serial.println("SetUp Completed");
 
 }
 
 void loop() {
   if (!setupComplete) {
-//    if (Serial.available() > 0) {
-//      String msg = Serial.readString();
-      Serial.println("Here");
-      Serial.flush();
-
-      String msg = "100,100,0,0,1,0,1,100,100,10,1,1,0,0,0,0,5,0,1.0,EOF";
+    if (Serial.available() > 0) {
+      String msg = Serial.readString();
+//      Serial.println("Here");
+//      Serial.flush();
+//
+//      String msg = "100,100,0,0,1,0,1,100,100,10,1,1,0,0,0,2000,5,5000,0.6,EOF";
       Serial.println(msg);
       Serial.flush();
       msg.trim();
@@ -90,9 +90,9 @@ void loop() {
       int laserPulseType = atoi(strings[12]);
       int laserSide = atoi(strings[13]);
       int laserOnSensor = atoi(strings[14]);
-      float laserOnDelay = atof(strings[15]);
+      unsigned long laserOnDelay = atof(strings[15]);
       int laserOffSensor = atoi(strings[16]);
-      float laserOffDelay = atof(strings[17]);
+      unsigned long laserOffDelay = atof(strings[17]);
       float laserProb = atof(strings[18]);
 
 
@@ -158,7 +158,7 @@ void loop() {
       if (nForceTrials > 0) {
         mazeProtocol.enactForceTrials();
       }
-//  }
+    }
   } else if (setupComplete && !trialsComplete){
       mazeProtocol.checkSensors();
       mazeProtocol.checkButtons();

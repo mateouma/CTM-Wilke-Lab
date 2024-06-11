@@ -240,7 +240,7 @@ def laser_OffSetUp(window):
 
     # Labels:
     tk.Label(window, text="Which Sensor Should Turn the Laser Off?").grid(row=1, column=0, padx=10, pady=5)
-    tk.Label(window, text="Time Delay Between Sensor Event and Laser Off (seconds):").grid(row=2, column=0, padx=10, pady=5)
+    tk.Label(window, text="Time Delay Between Sensor Event and Laser Off (ms):").grid(row=2, column=0, padx=10, pady=5)
 
     if onSensor == "Start":
         sensor_off_Options = ["Midstem", "Endstem", "Post Vertex", "Pre-Barrier", "Start Box"]
@@ -305,7 +305,7 @@ def laser_OnSetUp(window):
 
     # Labels:
     tk.Label(window, text="Which Sensor Should Turn the Laser On?").grid(row=1, column=0, padx=10, pady=5)
-    tk.Label(window, text="Time Delay Between Sensor Event and Laser On (seconds):").grid(row=2, column=0, padx=10, pady=5)
+    tk.Label(window, text="Time Delay Between Sensor Event and Laser On (ms):").grid(row=2, column=0, padx=10, pady=5)
     tk.Label(window, text="Which Type of Trial Should Turn the Laser On?").grid(row=3, column=0, padx=10, pady=5)
 
     sensor_on_Options = ["Start", "Midstem", "Endstem", "Post Vertex", "Pre-Barrier"]
@@ -453,9 +453,9 @@ def sendParams(window):
     
     print(total_samples)
     #Laser function will update global values:
-    protocol_param_string = f'{hr_pump_time},{lr_pump_time},{l_bar_height},{r_bar_height},{prob_HR},{prob_LR},{hr_side},{ITI},{delayTime},{total_samples},{laserSelected},{laserMode},{laserPulseType},{laserSide},{sensorArray[onSensor]},{onTimeDelay},{sensorArray[offSensor]},{offTimeDelay},{laserProb}'
+    protocol_param_string = f'{hr_pump_time},{lr_pump_time},{l_bar_height},{r_bar_height},{prob_HR},{prob_LR},{hr_side},{ITI},{delayTime},{total_samples},{laserSelected},{laserMode},{laserPulseType},{laserSide},{sensorArray[onSensor]},{onTimeDelay},{sensorArray[offSensor]},{offTimeDelay},{laserProb},EOF'
     
-    protocol_param_string = "10,10,10,10,10,10,1,10,10,10,0,0,0,0,0,0,1,0,0"
+    # protocol_param_string = "10,10,10,10,10,10,1,10,10,10,0,0,0,0,0,0,1,0,0,EOF"
 
     ser.baudrate = 9600
     ser.port = selected_port
@@ -464,14 +464,20 @@ def sendParams(window):
     print(protocol_param_string)
     # Write protocol variables to Serial in form of a string
     ser.write(protocol_param_string.encode('utf-8'))
+    print("done writing")
     begin_recording()
     time.sleep(5)  # Increase the delay before starting data collection
     data_collection_ready()
     return
 
 def sendTestParams():    
-    protocol_param_string = "1000,500,0,0,1,0,1,100,100"
+    protocol_param_string = "100,100,0,0,1,0,1,100,100,10,1,1,0,0,0,2000,5,5000,1,EOF"
     
+    ser.baudrate = 9600
+    selected_port = port_selected.get().split(' ')[0]
+    ser.port = selected_port
+    ser.open()
+
     print(protocol_param_string)
     # Write protocol variables to Serial in form of a string
     ser.write(protocol_param_string.encode('utf-8'))
@@ -557,8 +563,8 @@ option_button2.grid(row=6, column=1, padx=10, pady=5)
 # Create the button
 button = tk.Button(window, text="Run Arduino Script", command=lambda: sendParams(window))
 button.grid(row=13, column=1, padx=10, pady=5)
-# button2 = tk.Button(window, text="Run Testing Script", command=lambda: sendTestParams())
-# button2.grid(row=14, column=1, padx=10, pady=5)
+button2 = tk.Button(window, text="Run Testing Script", command=lambda: sendTestParams())
+button2.grid(row=14, column=1, padx=10, pady=5)
 
 #button2 = tk.Button(window, text="Close Window", command=window.destroy())
 #button2.grid(row=7, column=2, padx=10, pady=5)
