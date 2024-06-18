@@ -64,6 +64,7 @@ void CTM_base::begin() {
 
   pinMode(PIR_Start, INPUT);
   pinMode(PIR_Midstem, INPUT);
+  pinMode(PIR_Endstem, INPUT);
   pinMode(PIR_RightPostVertex, INPUT);
   pinMode(PIR_RightPreBarrier, INPUT);
   pinMode(PIR_LeftPostVertex, INPUT);
@@ -74,6 +75,7 @@ void CTM_base::begin() {
   // turn on internal pull-up resistors
   digitalWrite(PIR_Start, HIGH);
   digitalWrite(PIR_Midstem, HIGH);
+  digitalWrite(PIR_Endstem, HIGH);
   digitalWrite(PIR_RightPostVertex, HIGH);
   digitalWrite(PIR_RightPreBarrier, HIGH);
   digitalWrite(PIR_LeftPostVertex, HIGH);
