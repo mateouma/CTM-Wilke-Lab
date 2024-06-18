@@ -1,7 +1,7 @@
 # CTM-Wilke-Lab
 Code for Continuous T-Maze (CTM)
 
-This repository contains the Wilke Lab code for the Automated Continues T-Maze. 
+This repository contains the Wilke Lab code for the Automated Continuous T-Maze. 
 
 This project is still in development and this repository will be updated as the maze is built and as bug fixes are deployed. 
 
